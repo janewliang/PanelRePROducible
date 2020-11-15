@@ -2,7 +2,7 @@
 
 This repository contains code to reproduce the results presented in the paper 
 
-> Liang, J. W., Idos, G., Hong, C., Gruber, S., Parmigiani, G., & Braun, D. (2020). PanelPRO: a general framework for multi-gene, multi-cancer Mendelian risk prediction models. 
+> **Liang, J. W., Idos, G., Hong, C., Gruber, S., Parmigiani, G., & Braun, D. (2020). PanelPRO: a general framework for multi-gene, multi-cancer Mendelian risk prediction models.**
 
 ## Dependencies
 - `PanelPRO` R package, Lee, G., et al. (2020)<sup>[1](#myfootnote1)</sup>.

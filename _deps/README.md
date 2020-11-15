@@ -1,4 +1,4 @@
-Functions for simulating pedigrees, running PanelPRO models, and obtaining diagnostic metrics. They will be called as dependencies to run the simulation studies and data application. 
+Functions for simulating pedigrees, running PanelPRO models, and obtaining diagnostic metrics. They are called as dependencies to run the simulation studies and data application. 
 
 ### Simulating Families
 - `family_simulation_functions/`: Code to simulate detailed pedigrees, including family history of cancer, genotypes, and tumor marker testing results. The primary function, `sim.simFam`, can be found in `sim.simFam.R`. For further details, see the individual function documentation. 
