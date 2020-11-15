@@ -13,7 +13,7 @@ This repository contains the code to reproduce the results presented in the pape
 ## Navigation
 Additional details can be found in the sub-directory README files. 
 
-### Shared Functions
+### Shared Code Dependencies
 - `_deps/`: Functions for simulating pedigrees, running PanelPRO models, and obtaining diagnostic metrics. They are called as dependencies to run the simulation studies and data application. 
 
 ### Simulation Studies

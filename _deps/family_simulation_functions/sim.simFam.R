@@ -82,7 +82,7 @@ sim.simFam = function(nSibsPatern, nSibsMatern, nSibs, nGrandchild,
   
   # Check that specified genes are in the vector of allele frequencies
   if (any(!(genes %in% names(alleleFreq)))) {
-    stop("Genos that are not in the vector of allele frequencies have been specified.")
+    stop("Genes that are not in the vector of allele frequencies have been specified.")
   }
   # Subset allele frequencies to only include those genes
   alleleFreq = alleleFreq[genes]
@@ -321,6 +321,3 @@ sim.simFam = function(nSibsPatern, nSibsMatern, nSibs, nGrandchild,
   
   return(fam)
 }
-
-# fam = sim.simFam(nSibsPatern, nSibsMatern, nSibs, nGrandchild, 
-#                  alleleFreq, CP, BiomarkerTesting=PanelPRODatabase$BiomarkerTesting, genes=genes, cancers=cancers_long, includeBiomarkers = TRUE, includeGeno=TRUE)

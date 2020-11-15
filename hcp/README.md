@@ -1,4 +1,4 @@
-Code to validate PanelPRO models on data from the USC-Stanford Hereditary Cancer Panel (HCP) Testing Study by Idos, G., et al. (2019)<sup>[1](#myfootnote1)</sup>. 
+Code to validate PanelPRO models on data from the USC-Stanford Hereditary Cancer Panel (HCP) Testing Study<sup>[1](#myfootnote1)</sup>. 
 
 ### Data processing
 - `hcp_data.RData`: Data for the HCP cohort of 2000 families, which includes detailed pedigrees, family history of cancer, and panel gene testing results. Not publicly available. 
@@ -18,7 +18,7 @@ Each sub-directory contains the following files:
 - `fam.R`: Code to split the HCP pedigrees into 20 approximately equal-sized parts and run the PanelPRO models. 
 - `rscript_fam.job` and`submitJobs_fam.sh`: Shell scripts for running models on the HCP cohort, for usage on a high performance computing cluster. 
 - `diagnostics.sh`: Shell script for obtaining diagnostic metrics, for usage on a high performance computing cluster. 
-- `rscript_diagnostics_boot_job`, `submitJobs_diagnostics_boot.sh`, and `combine_diagnostics_boot.sh`: Shell scripts for obtaining diagnostic metrics from 1000 bootstrapped samples, for usage on a high performance computing cluster. 
+- `rscript_diagnostics_boot_job`, `submitJobs_diagnostics_boot.sh`, and `combine_diagnostics_boot.sh`: Shell scripts for obtaining diagnostic metrics from 1000 bootstrap samples, for usage on a high performance computing cluster. 
 
 ---
 
