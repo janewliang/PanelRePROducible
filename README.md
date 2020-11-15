@@ -1,6 +1,6 @@
 # PanelRePROducible
 
-This repository contains the code to reproduce the results presented in the paper 
+This repository contains code to reproduce the results presented in the paper 
 
 > Liang, J. W., Idos, G., Hong, C., Gruber, S., Parmigiani, G., & Braun, D. (2020). PanelPRO: a general framework for multi-gene, multi-cancer Mendelian risk prediction models. 
 
@@ -24,13 +24,13 @@ Additional details can be found in the sub-directory README files.
 - `hcp/`: Code to validate PanelPRO models on the HCP cohort. 
 
 ### Visualizations
-- `plots/`: Code to generate figures and tables in paper based on results from `sim/`, `sim_upper`, and `hcp`. 
+- `plots/`: Code to generate figures and tables in paper, based on results from `sim/`, `sim_upper`, and `hcp`. 
 
 ## Useful Terminology
-- *PanelPRO-5BC*: Mendelian risk prediction model that identifies individuals at high risk for breast and ovarian cancer due to ATM, BRCA1, BRCA2, CHEK2, and PALB2 mutations. 
-- *PanelPRO-7*: Mendelian risk prediction model that identifies individuals at high risk for breast, colorectal, endometrial, ovarian, pancreatic, and skin cancer due to BRCA1, BRCA2, CDKN2A, MLH1, MSH2, MSH6, and (hypothetical) PANC mutations. This model spans all of the genes and cancers currently incorporated in models in the BayesMendel R package<sup>[2](#myfootnote2)</sup>. 
-- *PanelPRO-11*: Mendelian risk prediction model that identifies individuals at high risk for eleven cancers (brain, breast, colorectal, endometrial, gastric, kidney, melanoma, ovarian, pancreatic, prostate, and small intestine) due to mutations in eleven genes (ATM, BRCA1, BRCA2, CDKN2A, CHEK2, EPCAM, MSH1, MSH2, MLH6, PALB2, and PMS2). 
-- *Diagnostic metrics*: To evaluate the posterior carrier probabilities from our models, we used the area under the curve (AUC) as a measure for discrimination, the expected divided by the observed number of events as a measure of calibration, and mean squared error (MSE) as a measure of accuracy. When computing these diagnostics, non-carriers were defined as individuals who are not carriers of any mutation in the model. 
+- **PanelPRO-5BC**: Mendelian risk prediction model that identifies individuals at high risk for breast and ovarian cancer due to ATM, BRCA1, BRCA2, CHEK2, and PALB2 mutations. 
+- **PanelPRO-7**: Mendelian risk prediction model that identifies individuals at high risk for breast, colorectal, endometrial, ovarian, pancreatic, and skin cancer due to BRCA1, BRCA2, CDKN2A, MLH1, MSH2, MSH6, and (hypothetical) PANC mutations. This model spans all of the genes and cancers currently incorporated in models in the BayesMendel R package<sup>[2](#myfootnote2)</sup>. 
+- **PanelPRO-11**: Mendelian risk prediction model that identifies individuals at high risk for eleven cancers (brain, breast, colorectal, endometrial, gastric, kidney, melanoma, ovarian, pancreatic, prostate, and small intestine) due to mutations in eleven genes (ATM, BRCA1, BRCA2, CDKN2A, CHEK2, EPCAM, MSH1, MSH2, MLH6, PALB2, and PMS2). 
+- **Diagnostic metrics**: To evaluate the posterior carrier probabilities from our models, we used the area under the curve (AUC) as a measure for discrimination, the expected divided by the observed number of events as a measure of calibration, and mean squared error (MSE) as a measure of accuracy. When computing these diagnostics, non-carriers were defined as individuals who are not carriers of any mutation in the model. 
 
 ---
 
