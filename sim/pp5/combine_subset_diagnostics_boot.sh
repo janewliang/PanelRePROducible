@@ -11,4 +11,4 @@
 #SBATCH --mail-type=END # Email
 #SBATCH --mail-user=jwliang@g.harvard.edu
 
-R CMD BATCH --no-restore --no-save ../../_scripts/combine_subset_diagnostics_boot.R results/cluster/combine_subset_diagnostics_boot.Rout
+R CMD BATCH --no-restore --no-save ../../_deps/combine_subset_diagnostics_boot.R results/cluster/combine_subset_diagnostics_boot.Rout

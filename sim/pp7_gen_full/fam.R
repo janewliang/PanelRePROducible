@@ -5,12 +5,12 @@ s = as.integer(Sys.getenv('SLURM_ARRAY_TASK_ID'))
 source("../../_deps/run_model_functions.R")
 
 # Load simulation functions
-files.sources = paste0("../../simulate_families/", 
-                       list.files("../../simulate_families/"))
+files.sources = paste0("../../_deps/family_simulation_functions/", 
+                       list.files("../../_deps/family_simulation_functions//"))
 sapply(files.sources, source)
 
-# Load USC families
-load("../../usc/usc_data/pp7/usc_families.rData")
+# Load HCP families
+load("../../hcp/hcp_data/pp7/hcp_families.rData")
 
 ###############################################################################
 
@@ -77,11 +77,11 @@ fam_output = lapply(1:nsim, function(i){
   
   # Set random seed
   set.seed(s*nsim+i)
-  # Sample from USC families
-  rn = sample(1:length(usc_families_PP), 1)
+  # Sample from HCP families
+  rn = sample(1:length(hcp_families_PP), 1)
   
-  # Get USC family structure
-  famStruct = get_usc_fam_struct(usc_families_PP[[rn]])
+  # Get HCP family structure
+  famStruct = get_hcp_fam_struct(hcp_families_PP[[rn]])
   
   # Randomly sample number of males and females in each branch of the family.
   # Paternal aunt, paternal uncles

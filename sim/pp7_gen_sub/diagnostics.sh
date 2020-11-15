@@ -11,4 +11,4 @@
 #SBATCH --mail-type=END # Email
 #SBATCH --mail-user=jwliang@g.harvard.edu
 
-R CMD BATCH --no-restore --no-save ../../_scripts/pp7/diagnostics.R results/cluster/diagnostics.Rout
+R CMD BATCH --no-restore --no-save ../../_deps/pp7/diagnostics.R results/cluster/diagnostics.Rout

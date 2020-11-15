@@ -1,7 +1,7 @@
 # Discrimination (AUC)
 library(pROC)
 
-# Calibratation (does it sum up to the number of carriers?)
+# Calibration
 # Ratio of the sum of predicted to the sum of observed
 # Drops NAs
 # x = vector of observed values
@@ -10,7 +10,7 @@ calibration = function(x, pred){
   na_idx = is.na(x) | is.na(pred)
   return((sum(pred[!na_idx])/sum(x[!na_idx])))
 }
-
+# Difference between predicted and observed
 calibration_diff = function(x, pred){
   na_idx = is.na(x) | is.na(pred)
   return(sum(pred[!na_idx]) - sum(x[!na_idx]))

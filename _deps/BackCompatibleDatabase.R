@@ -33,44 +33,23 @@ BackCompatibleDatabase$Penetrance["Pancreas","PANC","All_Races","Female",,"Net"]
 BackCompatibleDatabase$Penetrance["Pancreas","PANC","All_Races","Male",,"Net"] = 
   penet.panc.net$fMX[,"P1"]
 
-# DOC
+# Fill in DOC
 BackCompatibleDatabase$DOC = abind(BackCompatibleDatabase$DOC, 
                                    PANC=BackCompatibleDatabase$DOC[,"SEER",,,], 
                                    along=2)
 names(dimnames(BackCompatibleDatabase$DOC)) = c("Cancer", "Gene", "Race", "Sex", "Age")
 
-# Riskmod
+# Fill in risk modifiers
 BackCompatibleDatabase$Riskmod = abind(BackCompatibleDatabase$Riskmod, 
                                        PANC=array(1, dim=dim(BackCompatibleDatabase$Riskmod[,1,,,,])), 
                                        along=2)
 names(dimnames(BackCompatibleDatabase$Riskmod)) = c("Cancer", "Gene", "Intervention", 
                                                     "Sex", "IntervAge", "DataType")
 
-# Germline testing
+# Fill in germline testing
 BackCompatibleDatabase$GermlineTesting = abind(BackCompatibleDatabase$GermlineTesting, 
                                                PANC=rep(1, dim(BackCompatibleDatabase$GermlineTesting)[2]), 
                                                along=1)
-
-
-
-## Fix zero penetrances by replacing them with SEER
-for (cancer in dimnames(BackCompatibleDatabase$Penetrance)$Cancer) {
-  for (sex in c("Female", "Male")) {
-    zero_pen = rowSums(BackCompatibleDatabase$Penetrance[cancer,,"All_Races",sex,,"Net"]) == 0
-    if (any(zero_pen == TRUE)) {
-      BackCompatibleDatabase$Penetrance[cancer,zero_pen,"All_Races",sex,,"Net"] =
-        matrix(BackCompatibleDatabase$Penetrance[cancer,"SEER","All_Races",sex,,"Net"],
-               nrow=sum(zero_pen), ncol=dim(BackCompatibleDatabase$Penetrance)[5], byrow=TRUE)
-    }
-  }
-}
-
-
-## Set CBC penetrances to 0
-dimsPP = dim(BackCompatibleDatabase$Contralateral)
-BackCompatibleDatabase$Contralateral[1:dimsPP[1],1:dimsPP[2],1:dimsPP[3],1:dimsPP[4],1:dimsPP[5]] = 0
-
-
 
 
 ## Create a dummy family to generate penetrance densities and survivals

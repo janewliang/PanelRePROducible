@@ -41,7 +41,7 @@ fam2BayesMendelFam = function(fam_PP, ethnic="nonAJ") {
 }
 
 
-# Function to extract USC family structure from a single family
+# Function to extract HCP family structure from a single family
 # Assumes that family has the following columns: 
 # ID, MotherID, FatherID, Gender, Proband
 # Returns a 4 x 2 matrix of 
@@ -51,45 +51,45 @@ fam2BayesMendelFam = function(fam_PP, ethnic="nonAJ") {
 # - the number children of the proband (ngchild)
 # With respect to this language, the proband belongs to the "children" 
 # generation of the family.
-get_usc_fam_struct = function(usc_fam) {
+get_hcp_fam_struct = function(hcp_fam) {
   # Identify people who don't have parents
-  isBothParentsMissing = (usc_fam$MotherID == 0) & (usc_fam$FatherID == 0)
+  isBothParentsMissing = (hcp_fam$MotherID == 0) & (hcp_fam$FatherID == 0)
   
   # Proband ID
-  ID = usc_fam$ID[usc_fam$isProband==1]
+  ID = hcp_fam$ID[hcp_fam$isProband==1]
   
   # IDs of mother and father
-  mothID = usc_fam$MotherID[usc_fam$ID==ID]
-  fathID = usc_fam$FatherID[usc_fam$ID==ID]
+  mothID = hcp_fam$MotherID[hcp_fam$ID==ID]
+  fathID = hcp_fam$FatherID[hcp_fam$ID==ID]
   
   # IDs of paternal grandparents
-  mothID.patern = usc_fam$MotherID[usc_fam$ID==fathID]
-  fathID.patern = usc_fam$FatherID[usc_fam$ID==fathID]
+  mothID.patern = hcp_fam$MotherID[hcp_fam$ID==fathID]
+  fathID.patern = hcp_fam$FatherID[hcp_fam$ID==fathID]
   
   # IDs of maternal grandparents
-  mothID.matern = usc_fam$MotherID[usc_fam$ID==mothID]
-  fathID.matern = usc_fam$FatherID[usc_fam$ID==mothID]
+  mothID.matern = hcp_fam$MotherID[hcp_fam$ID==mothID]
+  fathID.matern = hcp_fam$FatherID[hcp_fam$ID==mothID]
   
   # Number of paternal aunts and uncles
-  nsibs.patern = c(sum((!(isBothParentsMissing) & usc_fam$MotherID == mothID.patern & 
-                          usc_fam$FatherID == fathID.patern)[usc_fam$Sex==0], na.rm=TRUE), 
-                   sum((!(isBothParentsMissing) & usc_fam$MotherID == mothID.patern & 
-                          usc_fam$FatherID == fathID.patern)[usc_fam$Sex==1], na.rm=TRUE))
+  nsibs.patern = c(sum((!(isBothParentsMissing) & hcp_fam$MotherID == mothID.patern & 
+                          hcp_fam$FatherID == fathID.patern)[hcp_fam$Sex==0], na.rm=TRUE), 
+                   sum((!(isBothParentsMissing) & hcp_fam$MotherID == mothID.patern & 
+                          hcp_fam$FatherID == fathID.patern)[hcp_fam$Sex==1], na.rm=TRUE))
   # Number of maternal aunts and uncles
-  nsibs.matern = c(sum((!(isBothParentsMissing) & usc_fam$MotherID == mothID.matern & 
-                          usc_fam$FatherID == fathID.matern)[usc_fam$Sex==0], na.rm=TRUE), 
-                   sum((!(isBothParentsMissing) & usc_fam$MotherID == mothID.matern & 
-                          usc_fam$FatherID == fathID.matern)[usc_fam$Sex==1], na.rm=TRUE))
+  nsibs.matern = c(sum((!(isBothParentsMissing) & hcp_fam$MotherID == mothID.matern & 
+                          hcp_fam$FatherID == fathID.matern)[hcp_fam$Sex==0], na.rm=TRUE), 
+                   sum((!(isBothParentsMissing) & hcp_fam$MotherID == mothID.matern & 
+                          hcp_fam$FatherID == fathID.matern)[hcp_fam$Sex==1], na.rm=TRUE))
   # Number of paternal sisters and brothers
-  nsibs = c(sum((!(isBothParentsMissing) & usc_fam$MotherID == mothID & 
-                   usc_fam$FatherID == fathID)[usc_fam$Sex==0], na.rm=TRUE), 
-            sum((!(isBothParentsMissing) & usc_fam$MotherID == mothID & 
-                   usc_fam$FatherID == fathID)[usc_fam$Sex==1], na.rm=TRUE))
+  nsibs = c(sum((!(isBothParentsMissing) & hcp_fam$MotherID == mothID & 
+                   hcp_fam$FatherID == fathID)[hcp_fam$Sex==0], na.rm=TRUE), 
+            sum((!(isBothParentsMissing) & hcp_fam$MotherID == mothID & 
+                   hcp_fam$FatherID == fathID)[hcp_fam$Sex==1], na.rm=TRUE))
   # Number of grandchildren
-  ngchild = c(sum((!(isBothParentsMissing) & usc_fam$MotherID == ID | 
-                     usc_fam$FatherID == ID)[usc_fam$Sex==0], na.rm=TRUE), 
-              sum((!(isBothParentsMissing) & usc_fam$MotherID == ID |
-                     usc_fam$FatherID == ID)[usc_fam$Sex==1], na.rm=TRUE))
+  ngchild = c(sum((!(isBothParentsMissing) & hcp_fam$MotherID == ID | 
+                     hcp_fam$FatherID == ID)[hcp_fam$Sex==0], na.rm=TRUE), 
+              sum((!(isBothParentsMissing) & hcp_fam$MotherID == ID |
+                     hcp_fam$FatherID == ID)[hcp_fam$Sex==1], na.rm=TRUE))
   
   # Drop the father, mother, and proband from counts, if necessary
   if (nsibs.patern[2] > 0) {
@@ -98,8 +98,8 @@ get_usc_fam_struct = function(usc_fam) {
   if (nsibs.matern[1] > 0) {
     nsibs.matern[1] = nsibs.matern[1]-1
   }
-  if (nsibs[usc_fam$Sex[usc_fam$ID==ID]+1] > 0) {
-    nsibs[usc_fam$Sex[usc_fam$ID==ID]+1] = nsibs[usc_fam$Sex[usc_fam$ID==ID]+1]-1
+  if (nsibs[hcp_fam$Sex[hcp_fam$ID==ID]+1] > 0) {
+    nsibs[hcp_fam$Sex[hcp_fam$ID==ID]+1] = nsibs[hcp_fam$Sex[hcp_fam$ID==ID]+1]-1
   }
   
   # Return table of relative counts
