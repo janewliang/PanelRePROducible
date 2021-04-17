@@ -62,26 +62,47 @@ dummy.db$Contralateral = BackCompatibleDatabase$Contralateral
 # Run `checkFam` on the dummy family
 dummy.fam.checked = checkFam(dummy.fam, dummy.db)$ped_list[[1]]
 
+# Define possible genotypes
+PGs = PanelPRO:::.getPossibleGenotype(
+  dummy.db$MS$ALL_GENE_VARIANTS, max_mut = 2, 
+  homo_genes = dummy.db$MS$HOMOZYGOUS)
+
+# Extract genotypes with no more than 1 mutation
+direct_fill_PGs <- unname(PGs$list[rowSums(PGs$df) < 2])
+# Extract genotypes with 2 or more mutations
+# Character strings used for naming
+multi_PGs <- unname(PGs$list[rowSums(PGs$df) >= 2]) 
+# In list format
+multi_muts <- strsplit(PGs$list, split = "\\.")[rowSums(PGs$df) >= 2] 
+
 # Cancer penetrance densities and survivals
-CP = calcCancerPenetrance(dummy.fam.checked, dummy.db, 
-                          max_mut=2, net=TRUE, consider.modification=FALSE)
+CP = PanelPRO:::calcCancerPenetrance(
+  dummy.fam.checked, dummy.fam.checked$ID, 
+  dummy.db, sub_dens = NULL, 
+  PGs,direct_fill_PGs, multi_PGs, multi_muts, 
+  net=TRUE, consider.modification=FALSE)
 
 # Extract allele frequencies from database
-alleleFreq = BackCompatibleDatabase$AlleleFrequency[,"nonAJ"][genes]
+all_gene_variants = PanelPRO:::DEFAULT_VARIANTS[genes]
+alleles = unique(sub("_.*_", "_", all_gene_variants))
+alleleFreq = dummy.db$af[,"nonAJ"][alleles]
+names(alleleFreq) = genes
 
 # Age at which to obtain relative risks
 age = 70
 RR_female = sapply(cancers_long, function(canc) {
-  CP$Dens["1", canc, genes, as.character(age)] / 
+  CP$Dens["1", canc, dummy.db$MS$ALL_GENE_VARIANTS, as.character(age)] / 
     CP$Dens["1", canc, "noncarrier", as.character(age)]
 })
+dimnames(RR_female)[[1]] = genes
 RR_male = sapply(cancers_long, function(canc) {
-  CP$Dens["2", canc, genes, as.character(age)] / 
+  CP$Dens["2", canc, dummy.db$MS$ALL_GENE_VARIANTS, as.character(age)] / 
     CP$Dens["2", canc, "noncarrier", as.character(age)]
 })
+dimnames(RR_male)[[1]] = genes
 
 
-# Pull out AUC for each mutation
+# Pull out AUC for each gene
 AUCs = sapply(genes, function(x){
   diagnostics[[x]]["AUC", "PanelPRO"]
 })
@@ -96,7 +117,7 @@ my_cols = c("#E69F00", "#009E73", "#882255", "#888888",
 my_pch = c(0:6, 15:18)
 
 
-# Plot AUC for each mutation against allele frequencies 
+# Plot AUC for each gene against allele frequencies 
 text_x = alleleFreq + c(0, -0.00008, 0.00001, 0, -0.00005, 
                         0.00005, -0.00005, 0.0001, 0, 0, 0)
 text_y = AUCs + c(0.02, 0.02, 0.02, 0.02, 0.02, -0.02, 
@@ -106,7 +127,7 @@ par(mar=c(5.3, 5.3, 1, 1), bg=NA)
 
 # AUC vs prevalence
 plot(alleleFreq, AUCs, col=my_cols, pch=8, 
-     xlab="Mutation Allele Frequency", ylab="AUC", 
+     xlab="Pathogenic Variant Allele Frequency", ylab="AUC", 
      cex=1.8, cex.lab=1.6, cex.axis=1.6, cex.main=1.8)
 text(text_x, text_y, names(alleleFreq), cex=1.4)
 dev.off()
@@ -127,7 +148,7 @@ invisible(lapply(1:length(cancers_long), function(i){
          col=my_cols, pch=my_pch[i], cex=1.8)
 }))
 legend("topright", legend=genes, 
-       fill=my_cols, title="Mutation", bty="n", cex=1, 
+       fill=my_cols, title="Gene", bty="n", cex=1, 
        xpd=TRUE, inset=c(-0.17,0))
 legend("bottomright", legend=cancers_long, 
        pch=my_pch, title="Cancer", bty="n", cex=1, pt.cex=1.8, 
@@ -148,7 +169,7 @@ invisible(lapply(1:length(cancers_long), function(i){
          col=my_cols, pch=my_pch[i], cex=1.8)
 }))
 legend("topright", legend=genes, 
-       fill=my_cols, title="Mutation", bty="n", cex=1, 
+       fill=my_cols, title="Gene", bty="n", cex=1, 
        xpd=TRUE, inset=c(-0.17,0))
 legend("bottomright", legend=cancers_long, 
        pch=my_pch, title="Cancer", bty="n", cex=1, pt.cex=1.8, 
@@ -169,7 +190,7 @@ invisible(lapply(1:length(cancers_long), function(i){
          col=my_cols, pch=my_pch[i], cex=1.8)
 }))
 legend("topright", legend=genes, 
-       fill=my_cols, title="Mutation", bty="n", cex=1, 
+       fill=my_cols, title="Gene", bty="n", cex=1, 
        xpd=TRUE, inset=c(-0.17,0))
 legend("bottomright", legend=cancers_long, 
        pch=my_pch, title="Cancer", bty="n", cex=1, pt.cex=1.8, 
@@ -189,6 +210,7 @@ tab = data.frame(
           rbind(RR_female[,canc], RR_male[,canc])
         }))))
 tab = tab[apply(tab[-c(1,2)], 1, function(x){!any(is.nan(x))}),]
+tab$Estimate[19] = "Prostate RR (age 70)"
 rownames(tab) = NULL
 
 kable(tab[,1:8], format="latex", digits=5)

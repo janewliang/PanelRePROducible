@@ -29,6 +29,19 @@ boot_diagnostics_summary = lapply(reshaped_boot_diagnostics, function(x){
 })
 names(boot_diagnostics_summary) = dimnames(all_diagnostics_boot[[1]])[[3]]
 
+
+# Proportion of bootstraps where the full model improves over the sub-model
+improvement_freq = lapply(reshaped_boot_diagnostics, function(x) {
+  rbind(PP = c("AUC" = mean(x[1,1,] >= x[1,2,]), 
+               "E/O" = mean(abs(1-x[2,1,]) <= abs(1-x[2,2,])), 
+               "MSE" = mean(x[5,1,] <= x[5,2,])), 
+        BM = c("AUC" = mean(x[1,1,] >= x[1,3,]), 
+               "E/O" = mean(abs(1-x[2,1,]) <= abs(1-x[2,3,])), 
+               "MSE" = mean(x[5,1,] <= x[5,3,])))
+})
+names(improvement_freq) = dimnames(all_diagnostics_boot[[1]])[[3]]
+
+
 # Save and return summary statistics
-save(boot_diagnostics_summary, 
+save(boot_diagnostics_summary, improvement_freq, 
      file="results/diagnostics/subset_boot_diagnostics_summary.rData")

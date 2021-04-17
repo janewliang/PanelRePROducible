@@ -1,7 +1,7 @@
 library(abind)
 library(knitr)
 
-res_dir = "../sim/pp7_gen_sub/"
+res_dir = "../sim/pp7/"
 img_dir = "img/sim_pp7/"
 
 # Read in diagnostics
@@ -13,15 +13,15 @@ mods = c("PanelPRO_sub"=2, "BayesMendel_sub"=3)
 
 # Metrics
 metrics = c("AUC"=1, "E/O"=2, "MSE"=5)
-# Mutations
-mutations = names(diagnostics)
-names(mutations) = gsub("_", " ", mutations)
-names(mutations)[10] = "Any"
+# Genes
+genes = names(diagnostics)
+names(genes) = gsub("_", " ", genes)
+names(genes)[10] = "Any"
 
 
 # Pull out and reshape relevant diagnostics
 reshaped_diagnostics = lapply(metrics, function(x){
-  sapply(mutations, function(y){ diagnostics[[y]][x,mods] })
+  sapply(genes, function(y){ diagnostics[[y]][x,mods] })
 })
 
 # Put all bootstrap confidence intervals together
@@ -29,7 +29,7 @@ reshaped_diagnostics = lapply(metrics, function(x){
 reshaped_diagnostics_CI95lo = 
   lapply(metrics, 
          function(x){
-           sapply(mutations, function(y){
+           sapply(genes, function(y){
              boot_diagnostics_summary[[y]]["CI95lo",x,mods]
            })
          })
@@ -37,7 +37,7 @@ reshaped_diagnostics_CI95lo =
 reshaped_diagnostics_CI95hi = 
   lapply(metrics, 
          function(x){
-           sapply(mutations, function(y){
+           sapply(genes, function(y){
              boot_diagnostics_summary[[y]]["CI95hi",x,mods]
            })
          })
@@ -45,11 +45,11 @@ reshaped_diagnostics_CI95hi =
 
 # Colors for plotting
 my_cols = c("#0072B2", "#E69F00")
-my_cols_mat = matrix(rep(my_cols, each=length(mutations)), ncol=length(my_cols))
-# Positions for mutations
-y_mat = matrix(rep(1:length(mutations), length(my_cols))+
+my_cols_mat = matrix(rep(my_cols, each=length(genes)), ncol=length(my_cols))
+# Positions for genes
+y_mat = matrix(rep(1:length(genes), length(my_cols))+
                  rep(c(-0.1, 0.1), 
-                     each=length(mutations)), ncol=length(my_cols))
+                     each=length(genes)), ncol=length(my_cols))
 
 # x-axis limits
 finite.min = function(x){min(x[is.finite(x)], na.rm=TRUE)}
@@ -95,19 +95,19 @@ invisible(sapply(names(metrics), function(x){
            y0=as.numeric(y_mat), y1=as.numeric(y_mat), 
            col=my_cols_mat)
   
-  # y-axis mutation labels
+  # y-axis gene labels
   if (x=="AUC") {
-    axis(2, 1:length(mutations), FALSE)
-    text(y=1:length(mutations), x=par("usr")[1]-(xmax[x]-xmin[x])/20, 
-         srt=50, adj=1, labels=names(mutations), xpd=TRUE, cex=1.5)
+    axis(2, 1:length(genes), FALSE)
+    text(y=1:length(genes), x=par("usr")[1]-(xmax[x]-xmin[x])/20, 
+         srt=60, adj=1, labels=names(genes), xpd=TRUE, cex=1.5)
   }
   
   # Reference line for AUC and calibration
   if(x=="AUC" || x=="E/O" || x=="O/E") {
-    segments(y0=0.65, y1=length(mutations)+0.35,
+    segments(y0=0.65, y1=length(genes)+0.35,
              x0=1, col="grey", lty=2)
   } else if (x=="E-O") {
-    segments(y0=0.65, y1=length(mutations)+0.34,
+    segments(y0=0.65, y1=length(genes)+0.34,
              x0=0, col="grey", lty=2)
   }
 }))
@@ -116,20 +116,20 @@ invisible(sapply(names(metrics), function(x){
 plot.new()
 par(bg=NA, xpd=TRUE)
 legend("bottom", inset = c(0, -38), 
-       legend=c("Full Model", "Submodel"), 
+       legend=c("PanelPRO", "BayesMendel"), 
        col=my_cols, pch=16, 
        bty="n", ncol=2, lty=1, cex=1.4)
 dev.off()
 
 
-# Tables of values
+# Tables of diagnostic metrics
 lapply(names(metrics), function(x) {
-  tab = data.frame(as.vector(sapply(names(mutations), function(y){ c(y, "")})),
+  tab = data.frame(as.vector(sapply(names(genes), function(y){ c(y, "")})),
              c("PanelPRO", "BayesMendel"), 
              as.vector(reshaped_diagnostics[[x]]), 
              as.vector(reshaped_diagnostics_CI95lo[[x]]), 
              as.vector(reshaped_diagnostics_CI95hi[[x]]))
-  names(tab) =  c("Mutation", "Model", "Estimate", 
+  names(tab) =  c("Gene", "Model", "Estimate", 
                   "Bootstrap 2.5%", "Bootstrap 97.5%")
   return(kable(tab, format="latex", digits=5))
 })

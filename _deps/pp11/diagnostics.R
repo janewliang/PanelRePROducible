@@ -15,21 +15,16 @@ for (k in 1:K){
   all_fam_output = c(all_fam_output, fam_output)
 }
 # Simulated families
-hcp_families_sim = lapply(all_fam_output, function(x){ x$fam})
+usc_families_sim = lapply(all_fam_output, function(x){ x$fam})
 # Carrier probabilities
 all_probs = lapply(all_fam_output, function(x){ x$probs})
-
-# No failed families
-failed_families = sapply(all_probs, function(x){length(x)==0 || class(x)=="try-error"})
-all_probs[failed_families] = NULL
 
 # Pull out the proband mutation information from each family
 mutations = c("ATM", "BRCA1", "BRCA2", "CDKN2A", "CHEK2", "EPCAM",
               "MLH1", "MSH2", "MSH6", "PALB2", "PMS2")
-mut_df = data.frame(t(sapply(hcp_families_sim, function(fam){
+mut_df = data.frame(t(sapply(usc_families_sim, function(fam){
   unlist(fam[fam$isProband==1,mutations])
 })))
-mut_df = mut_df[!failed_families,]
 
 # Pull out the probabilities for each model and save as a 3D array
 prob_df = abind(all_probs, along=3)
@@ -50,7 +45,7 @@ all_out = list(
   ATM = get_all_diagnostics("ATM", NULL, mut_df, prob_df, noncarrier_idx), 
   BRCA1 = get_all_diagnostics("BRCA1", "brcapro", mut_df, prob_df, noncarrier_idx), 
   BRCA2 = get_all_diagnostics("BRCA2", "brcapro", mut_df, prob_df, noncarrier_idx), 
-  brcapro_genes = get_all_diagnostics(c("BRCA1", "BRCA2"), "brcapro", 
+  BRCAPRO_genes = get_all_diagnostics(c("BRCA1", "BRCA2"), "brcapro", 
                                       mut_df, prob_df, noncarrier_idx), 
   CDKN2A = get_all_diagnostics("CDKN2A", "melapro", mut_df, prob_df, noncarrier_idx), 
   CHEK2 = get_all_diagnostics("CHEK2", NULL, mut_df, prob_df, noncarrier_idx), 

@@ -33,23 +33,29 @@ BackCompatibleDatabase$Penetrance["Pancreas","PANC","All_Races","Female",,"Net"]
 BackCompatibleDatabase$Penetrance["Pancreas","PANC","All_Races","Male",,"Net"] = 
   penet.panc.net$fMX[,"P1"]
 
-# Fill in DOC
+# DOC
 BackCompatibleDatabase$DOC = abind(BackCompatibleDatabase$DOC, 
                                    PANC=BackCompatibleDatabase$DOC[,"SEER",,,], 
                                    along=2)
 names(dimnames(BackCompatibleDatabase$DOC)) = c("Cancer", "Gene", "Race", "Sex", "Age")
 
-# Fill in risk modifiers
+# Riskmod
 BackCompatibleDatabase$Riskmod = abind(BackCompatibleDatabase$Riskmod, 
                                        PANC=array(1, dim=dim(BackCompatibleDatabase$Riskmod[,1,,,,])), 
                                        along=2)
 names(dimnames(BackCompatibleDatabase$Riskmod)) = c("Cancer", "Gene", "Intervention", 
                                                     "Sex", "IntervAge", "DataType")
 
-# Fill in germline testing
+# Germline testing
 BackCompatibleDatabase$GermlineTesting = abind(BackCompatibleDatabase$GermlineTesting, 
                                                PANC=rep(1, dim(BackCompatibleDatabase$GermlineTesting)[2]), 
                                                along=1)
+
+## Set CBC penetrances to 0
+dimsPP = dim(BackCompatibleDatabase$Contralateral)
+BackCompatibleDatabase$Contralateral[1:dimsPP[1],1:dimsPP[2],1:dimsPP[3],1:dimsPP[4],1:dimsPP[5]] = 0
+
+
 
 
 ## Create a dummy family to generate penetrance densities and survivals
@@ -91,32 +97,112 @@ dummy.fam.checked = checkFam(dummy.fam, dummy.db)$ped_list[[1]]
 # Get brcapro penetrances
 # Database
 brcapro.db = buildDatabase("BRCAPRO", ppd=BackCompatibleDatabase)
+
+# Define possible genotypes
+brcapro.PGs <- PanelPRO:::.getPossibleGenotype(
+  brcapro.db$MS$ALL_GENE_VARIANTS,  max_mut = 2, 
+  homo_genes = brcapro.db$MS$HOMOZYGOUS)
+
+# Extract genotypes with no more than 1 mutation
+brcapro.direct_fill_PGs <- unname(brcapro.PGs$list[rowSums(brcapro.PGs$df) < 2])
+# Extract genotypes with 2 or more mutations
+# Character strings used for naming
+brcapro.multi_PGs <- unname(brcapro.PGs$list[rowSums(brcapro.PGs$df) >= 2]) 
+# In list format
+brcapro.multi_muts <- strsplit(brcapro.PGs$list, 
+                               split = "\\.")[rowSums(brcapro.PGs$df) >= 2] 
+
 # Cancer penetrance densities and survivals
-brcapro.CP = calcCancerPenetrance(dummy.fam.checked, brcapro.db, 
-                     max_mut=2, net=TRUE, consider.modification=FALSE)
+brcapro.CP = PanelPRO:::calcCancerPenetrance(
+  dummy.fam.checked, dummy.fam.checked$ID, 
+  brcapro.db, sub_dens = NULL, 
+  brcapro.PGs, brcapro.direct_fill_PGs, 
+  brcapro.multi_PGs, brcapro.multi_muts, 
+  net=TRUE, consider.modification=FALSE)
+
 
 # mmrpro
 # Database
 mmrpro.db = buildDatabase("MMRPRO", ppd=BackCompatibleDatabase)
+
+# Define possible genotypes
+mmrpro.PGs <- PanelPRO:::.getPossibleGenotype(
+  mmrpro.db$MS$ALL_GENE_VARIANTS,  max_mut = 2, 
+  homo_genes = mmrpro.db$MS$HOMOZYGOUS)
+
+# Extract genotypes with no more than 1 mutation
+mmrpro.direct_fill_PGs <- unname(mmrpro.PGs$list[rowSums(mmrpro.PGs$df) < 2])
+# Extract genotypes with 2 or more mutations
+# Character strings used for naming
+mmrpro.multi_PGs <- unname(mmrpro.PGs$list[rowSums(mmrpro.PGs$df) >= 2]) 
+# In list format
+mmrpro.multi_muts <- strsplit(mmrpro.PGs$list, 
+                              split = "\\.")[rowSums(mmrpro.PGs$df) >= 2] 
+
 # Cancer penetrance densities and survivals
-mmrpro.CP = calcCancerPenetrance(dummy.fam.checked, mmrpro.db, 
-                    max_mut=2, net=TRUE, consider.modification=FALSE)
+mmrpro.CP = PanelPRO:::calcCancerPenetrance(
+  dummy.fam.checked, dummy.fam.checked$ID, 
+  mmrpro.db, sub_dens = NULL, 
+  mmrpro.PGs, mmrpro.direct_fill_PGs, 
+  mmrpro.multi_PGs, mmrpro.multi_muts, 
+  net=TRUE, consider.modification=FALSE)
+
 
 # pancpro
 # Database
 pancpro.db = buildDatabase(genes="PANC", cancers="Pancreas", 
                            ppd=BackCompatibleDatabase)
+
+# Define possible genotypes
+pancpro.PGs <- PanelPRO:::.getPossibleGenotype(
+  pancpro.db$MS$ALL_GENE_VARIANTS,  max_mut = 2, 
+  homo_genes = pancpro.db$MS$HOMOZYGOUS)
+
+# Extract genotypes with no more than 1 mutation
+pancpro.direct_fill_PGs <- unname(pancpro.PGs$list[rowSums(pancpro.PGs$df) < 2])
+# Extract genotypes with 2 or more mutations
+# Character strings used for naming
+pancpro.multi_PGs <- unname(pancpro.PGs$list[rowSums(pancpro.PGs$df) >= 2]) 
+# In list format
+pancpro.multi_muts <- strsplit(pancpro.PGs$list, 
+                               split = "\\.")[rowSums(pancpro.PGs$df) >= 2] 
+
 # Cancer penetrance densities and survivals
-pancpro.CP = calcCancerPenetrance(dummy.fam.checked, pancpro.db, 
-                     max_mut=2, net=TRUE, consider.modification=FALSE)
+pancpro.CP = PanelPRO:::calcCancerPenetrance(
+  dummy.fam.checked, dummy.fam.checked$ID, 
+  pancpro.db, sub_dens = NULL, 
+  pancpro.PGs, pancpro.direct_fill_PGs, 
+  pancpro.multi_PGs, pancpro.multi_muts, 
+  net=TRUE, consider.modification=FALSE)
+
 
 # melapro
 # Database
 melapro.db = buildDatabase(genes="CDKN2A", cancers="Melanoma", 
                            ppd=BackCompatibleDatabase)
+
+# Define possible genotypes
+melapro.PGs <- PanelPRO:::.getPossibleGenotype(
+  melapro.db$MS$ALL_GENE_VARIANTS,  max_mut = 2, 
+  homo_genes = melapro.db$MS$HOMOZYGOUS)
+
+# Extract genotypes with no more than 1 mutation
+melapro.direct_fill_PGs <- unname(melapro.PGs$list[rowSums(melapro.PGs$df) < 2])
+# Extract genotypes with 2 or more mutations
+# Character strings used for naming
+melapro.multi_PGs <- unname(melapro.PGs$list[rowSums(melapro.PGs$df) >= 2]) 
+# In list format
+melapro.multi_muts <- strsplit(melapro.PGs$list, 
+                               split = "\\.")[rowSums(melapro.PGs$df) >= 2] 
+
 # Cancer penetrance densities and survivals
-melapro.CP = calcCancerPenetrance(dummy.fam.checked, melapro.db, 
-                     max_mut=2, net=TRUE, consider.modification=FALSE)
+melapro.CP = PanelPRO:::calcCancerPenetrance(
+  dummy.fam.checked, dummy.fam.checked$ID, 
+  melapro.db, sub_dens = NULL, 
+  melapro.PGs, melapro.direct_fill_PGs, 
+  melapro.multi_PGs, melapro.multi_muts, 
+  net=TRUE, consider.modification=FALSE)
+
 
 
 # brcapro penetrances
@@ -124,7 +210,7 @@ penet.brca.net.PP = penet.brca.net
 # brcapro genotypes
 brca.genotypes.BM = c("B00", "B10", "B01", "B11")
 # Corresponding PanelPRO genotypes
-brca.genotypes.PP = c("noncarrier", "BRCA1", "BRCA2", "BRCA1.BRCA2")
+brca.genotypes.PP = dimnames(brcapro.CP$Dens)$genotypes
 
 # First person is female
 # Breast
@@ -147,7 +233,7 @@ penet.mmr.net.PP = penet.mmr.net
 # mmrpro genotypes
 mmr.genotypes.BM = c("M000", "M100", "M010", "M001", "M110", "M101", "M011")
 # Corresponding PanelPRO genotypes
-mmr.genotypes.PP = c("noncarrier", "MLH1", "MSH2", "MSH6", "MLH1.MSH2", "MLH1.MSH6", "MSH2.MSH6")
+mmr.genotypes.PP = dimnames(mmrpro.CP$Dens)$genotypes
 
 # First person is female
 # Colorectal
@@ -170,7 +256,7 @@ penet.panc.net.PP = penet.panc.net
 # pancpro genotypes
 panc.genotypes.BM = c("P0", "P1")
 # Corresponding PanelPRO genotypes
-panc.genotypes.PP = c("noncarrier", "PANC")
+panc.genotypes.PP = dimnames(pancpro.CP$Dens)$genotypes
 
 # First person is female
 # Pancreatic
@@ -187,7 +273,7 @@ penet.mela.hbi.net.PP = penet.mela.hbi.net
 # melapro genotypes
 mela.genotypes.BM = c("P160", "P161")
 # Corresponding PanelPRO genotypes
-mela.genotypes.PP = c("noncarrier", "CDKN2A")
+mela.genotypes.PP = dimnames(melapro.CP$Dens)$genotypes
 
 # First person is female
 # Melanoma
@@ -197,6 +283,33 @@ penet.mela.hbi.net.PP$fFX[,!(colnames(penet.mela.hbi.net.PP$fFX) %in% mela.genot
 # Melanoma
 penet.mela.hbi.net.PP$fMX[,mela.genotypes.BM] = t(melapro.CP$Dens["2", "Melanoma",mela.genotypes.PP,-95])
 penet.mela.hbi.net.PP$fMX[,!(colnames(penet.mela.hbi.net.PP$fMX) %in% mela.genotypes.BM)] = 0
+
+
+## Set brcapro CBC to be the same as PanelPRODatabase
+# # Contralateral breast cancer penetrances
+# CBRCApenet.2016.PP = CBRCApenet.2016
+# # brcapro genotypes
+# cbc.genotypes.BM = c("G000", "G100", "G010", "G110")
+# # Corresponding PanelPRO genotypes
+# cbc.genotypes.PP = c("noncarrier", "BRCA1", "BRCA2", "BRCA1.BRCA2")
+# 
+# # First person is a female over 40
+# CBRCApenet.2016.PP$fFX.Over40[1:95, cbc.genotypes.BM] = t(brcapro.CP$Dens["1", "Contralateral", cbc.genotypes.PP,])
+# CBRCApenet.2016.PP$fFX.Over40[96:111, cbc.genotypes.BM] = 0
+# CBRCApenet.2016.PP$fFX.Over40[,!(colnames(CBRCApenet.2016.PP$fFX.Over40) %in% cbc.genotypes.BM)] = 0
+# # First person is a male over 40
+# CBRCApenet.2016.PP$fMX.Over40[1:95, cbc.genotypes.BM] = t(brcapro.CP$Dens["2", "Contralateral", cbc.genotypes.PP,])
+# CBRCApenet.2016.PP$fMX.Over40[96:111, cbc.genotypes.BM] = 0
+# CBRCApenet.2016.PP$fMX.Over40[,!(colnames(CBRCApenet.2016.PP$fMX.Over40) %in% cbc.genotypes.BM)] = 0
+# # First person is a female under 40
+# CBRCApenet.2016.PP$fFX.Under40[1:95, cbc.genotypes.BM] = t(brcapro.CP$Dens["3", "Contralateral", cbc.genotypes.PP,])
+# CBRCApenet.2016.PP$fFX.Under40[96:111, cbc.genotypes.BM] = 0
+# CBRCApenet.2016.PP$fFX.Under40[,!(colnames(CBRCApenet.2016.PP$fFX.Under40) %in% cbc.genotypes.BM)] = 0
+# # First person is a male under 40
+# CBRCApenet.2016.PP$fMX.Under40[1:95, cbc.genotypes.BM] = t(brcapro.CP$Dens["4", "Contralateral", cbc.genotypes.PP,])
+# CBRCApenet.2016.PP$fMX.Under40[96:111, cbc.genotypes.BM] = 0
+# CBRCApenet.2016.PP$fMX.Under40[,!(colnames(CBRCApenet.2016.PP$fMX.Under40) %in% cbc.genotypes.BM)] = 0
+
 
 
 ## Set CBC to 0 for both brcapro and PanelPRO

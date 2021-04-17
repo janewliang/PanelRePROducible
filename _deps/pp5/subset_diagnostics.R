@@ -3,30 +3,30 @@ library(abind)
 # Helper functions
 source("../../_deps/diagnostics_functions.R")
 
-# Load results from HCP data, to get the counts of each mutation carrier type
-load("../../hcp/pp5/results/output/all_dfs.rData")
-hcp_prob_df = prob_df 
-hcp_mut_df = mut_df
+# Load results from USC data, to get the counts of each mutation carrier type
+load("../../usc/pp5/results/output/all_dfs.rData")
+usc_prob_df = prob_df 
+usc_mut_df = mut_df
 
 # Load full simulation results
 load("results/output/all_dfs.rData")
 
 ###############################################################################
 
-# Data frame summarizing counts of each mutation carrier type in the HCP data
-hcp_mut_count_df = data.frame(mut=names(hcp_mut_df), 
-                              count=colSums(hcp_mut_df))
-# Stratified sample of indices based on HCP mutation counts
+# Data frame summarizing counts of each mutation carrier type in the USC data
+usc_mut_count_df = data.frame(mut=names(usc_mut_df), 
+                              count=colSums(usc_mut_df))
+# Stratified sample of indices based on USC mutation counts
 set.seed(1)
 idx = sort(c(
   # Stratified sample of mutation carriers
-  unlist(lapply(1:nrow(hcp_mut_count_df), function(i){
-    sample(which(mut_df[hcp_mut_count_df$mut[i]]==1), 
-           hcp_mut_count_df$count[i], replace=FALSE)
+  unlist(lapply(1:nrow(usc_mut_count_df), function(i){
+    sample(which(mut_df[usc_mut_count_df$mut[i]]==1), 
+           usc_mut_count_df$count[i], replace=FALSE)
   })), 
   # Sample non-carriers
   sample(which(apply(mut_df==0, 1, all)), 
-         nrow(hcp_mut_df)-sum(hcp_mut_count_df$count), replace=FALSE)))
+         nrow(usc_mut_df)-sum(usc_mut_count_df$count), replace=FALSE)))
 
 # Subset probabilities and proband mutation information
 prob_df = prob_df[,,idx]
@@ -48,7 +48,7 @@ all_out = list(
   ATM = get_all_diagnostics("ATM", NULL, mut_df, prob_df, noncarrier_idx), 
   BRCA1 = get_all_diagnostics("BRCA1", "brcapro", mut_df, prob_df, noncarrier_idx), 
   BRCA2 = get_all_diagnostics("BRCA2", "brcapro", mut_df, prob_df, noncarrier_idx), 
-  brcapro_genes = get_all_diagnostics(c("BRCA1", "BRCA2"), "brcapro", 
+  BRCAPRO_genes = get_all_diagnostics(c("BRCA1", "BRCA2"), "brcapro", 
                                       mut_df, prob_df, noncarrier_idx), 
   CHEK2 = get_all_diagnostics("CHEK2", NULL, mut_df, prob_df, noncarrier_idx), 
   PALB2 = get_all_diagnostics("PALB2", NULL, mut_df, prob_df, noncarrier_idx), 

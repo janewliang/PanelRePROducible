@@ -4,6 +4,22 @@ library(BayesMendel)
 # Load database that is back-compatible with the BayesMendel package
 load("../../_deps/BackCompatibleDatabase.rData")
 
+# Add PANC gene to the list of acceptable genes
+NEW_GENE_TYPES = c(PanelPRO:::GENE_TYPES, "PANC")
+NEW_GENE_TYPES = NEW_GENE_TYPES[!duplicated(NEW_GENE_TYPES)]
+assignInNamespace("GENE_TYPES", NEW_GENE_TYPES, 
+                  ns="PanelPRO", pos="package:PanelPRO")
+NEW_ALL_GENE_VARIANT_TYPES = c(PanelPRO:::ALL_GENE_VARIANT_TYPES, 
+                               PANC = "PANC")
+NEW_ALL_GENE_VARIANT_TYPES = NEW_ALL_GENE_VARIANT_TYPES[!duplicated(NEW_ALL_GENE_VARIANT_TYPES)]
+assignInNamespace("ALL_GENE_VARIANT_TYPES", NEW_ALL_GENE_VARIANT_TYPES, 
+                  ns="PanelPRO", pos="package:PanelPRO")
+NEW_DEFAULT_VARIANTS = c(PanelPRO:::DEFAULT_VARIANTS, 
+                         PANC = "PANC")
+NEW_DEFAULT_VARIANTS = NEW_DEFAULT_VARIANTS[!duplicated(NEW_DEFAULT_VARIANTS)]
+assignInNamespace("DEFAULT_VARIANTS", NEW_DEFAULT_VARIANTS, 
+                  ns="PanelPRO", pos="package:PanelPRO")
+
 
 # Function to convert a family matrix from the PanelPro format to the 
 # BayesMendel format
@@ -41,7 +57,7 @@ fam2BayesMendelFam = function(fam_PP, ethnic="nonAJ") {
 }
 
 
-# Function to extract HCP family structure from a single family
+# Function to extract USC family structure from a single family
 # Assumes that family has the following columns: 
 # ID, MotherID, FatherID, Gender, Proband
 # Returns a 4 x 2 matrix of 
@@ -51,45 +67,45 @@ fam2BayesMendelFam = function(fam_PP, ethnic="nonAJ") {
 # - the number children of the proband (ngchild)
 # With respect to this language, the proband belongs to the "children" 
 # generation of the family.
-get_hcp_fam_struct = function(hcp_fam) {
+get_usc_fam_struct = function(usc_fam) {
   # Identify people who don't have parents
-  isBothParentsMissing = (hcp_fam$MotherID == 0) & (hcp_fam$FatherID == 0)
+  isBothParentsMissing = (usc_fam$MotherID == 0) & (usc_fam$FatherID == 0)
   
   # Proband ID
-  ID = hcp_fam$ID[hcp_fam$isProband==1]
+  ID = usc_fam$ID[usc_fam$isProband==1]
   
   # IDs of mother and father
-  mothID = hcp_fam$MotherID[hcp_fam$ID==ID]
-  fathID = hcp_fam$FatherID[hcp_fam$ID==ID]
+  mothID = usc_fam$MotherID[usc_fam$ID==ID]
+  fathID = usc_fam$FatherID[usc_fam$ID==ID]
   
   # IDs of paternal grandparents
-  mothID.patern = hcp_fam$MotherID[hcp_fam$ID==fathID]
-  fathID.patern = hcp_fam$FatherID[hcp_fam$ID==fathID]
+  mothID.patern = usc_fam$MotherID[usc_fam$ID==fathID]
+  fathID.patern = usc_fam$FatherID[usc_fam$ID==fathID]
   
   # IDs of maternal grandparents
-  mothID.matern = hcp_fam$MotherID[hcp_fam$ID==mothID]
-  fathID.matern = hcp_fam$FatherID[hcp_fam$ID==mothID]
+  mothID.matern = usc_fam$MotherID[usc_fam$ID==mothID]
+  fathID.matern = usc_fam$FatherID[usc_fam$ID==mothID]
   
   # Number of paternal aunts and uncles
-  nsibs.patern = c(sum((!(isBothParentsMissing) & hcp_fam$MotherID == mothID.patern & 
-                          hcp_fam$FatherID == fathID.patern)[hcp_fam$Sex==0], na.rm=TRUE), 
-                   sum((!(isBothParentsMissing) & hcp_fam$MotherID == mothID.patern & 
-                          hcp_fam$FatherID == fathID.patern)[hcp_fam$Sex==1], na.rm=TRUE))
+  nsibs.patern = c(sum((!(isBothParentsMissing) & usc_fam$MotherID == mothID.patern & 
+                          usc_fam$FatherID == fathID.patern)[usc_fam$Sex==0], na.rm=TRUE), 
+                   sum((!(isBothParentsMissing) & usc_fam$MotherID == mothID.patern & 
+                          usc_fam$FatherID == fathID.patern)[usc_fam$Sex==1], na.rm=TRUE))
   # Number of maternal aunts and uncles
-  nsibs.matern = c(sum((!(isBothParentsMissing) & hcp_fam$MotherID == mothID.matern & 
-                          hcp_fam$FatherID == fathID.matern)[hcp_fam$Sex==0], na.rm=TRUE), 
-                   sum((!(isBothParentsMissing) & hcp_fam$MotherID == mothID.matern & 
-                          hcp_fam$FatherID == fathID.matern)[hcp_fam$Sex==1], na.rm=TRUE))
+  nsibs.matern = c(sum((!(isBothParentsMissing) & usc_fam$MotherID == mothID.matern & 
+                          usc_fam$FatherID == fathID.matern)[usc_fam$Sex==0], na.rm=TRUE), 
+                   sum((!(isBothParentsMissing) & usc_fam$MotherID == mothID.matern & 
+                          usc_fam$FatherID == fathID.matern)[usc_fam$Sex==1], na.rm=TRUE))
   # Number of paternal sisters and brothers
-  nsibs = c(sum((!(isBothParentsMissing) & hcp_fam$MotherID == mothID & 
-                   hcp_fam$FatherID == fathID)[hcp_fam$Sex==0], na.rm=TRUE), 
-            sum((!(isBothParentsMissing) & hcp_fam$MotherID == mothID & 
-                   hcp_fam$FatherID == fathID)[hcp_fam$Sex==1], na.rm=TRUE))
+  nsibs = c(sum((!(isBothParentsMissing) & usc_fam$MotherID == mothID & 
+                   usc_fam$FatherID == fathID)[usc_fam$Sex==0], na.rm=TRUE), 
+            sum((!(isBothParentsMissing) & usc_fam$MotherID == mothID & 
+                   usc_fam$FatherID == fathID)[usc_fam$Sex==1], na.rm=TRUE))
   # Number of grandchildren
-  ngchild = c(sum((!(isBothParentsMissing) & hcp_fam$MotherID == ID | 
-                     hcp_fam$FatherID == ID)[hcp_fam$Sex==0], na.rm=TRUE), 
-              sum((!(isBothParentsMissing) & hcp_fam$MotherID == ID |
-                     hcp_fam$FatherID == ID)[hcp_fam$Sex==1], na.rm=TRUE))
+  ngchild = c(sum((!(isBothParentsMissing) & usc_fam$MotherID == ID | 
+                     usc_fam$FatherID == ID)[usc_fam$Sex==0], na.rm=TRUE), 
+              sum((!(isBothParentsMissing) & usc_fam$MotherID == ID |
+                     usc_fam$FatherID == ID)[usc_fam$Sex==1], na.rm=TRUE))
   
   # Drop the father, mother, and proband from counts, if necessary
   if (nsibs.patern[2] > 0) {
@@ -98,8 +114,8 @@ get_hcp_fam_struct = function(hcp_fam) {
   if (nsibs.matern[1] > 0) {
     nsibs.matern[1] = nsibs.matern[1]-1
   }
-  if (nsibs[hcp_fam$Sex[hcp_fam$ID==ID]+1] > 0) {
-    nsibs[hcp_fam$Sex[hcp_fam$ID==ID]+1] = nsibs[hcp_fam$Sex[hcp_fam$ID==ID]+1]-1
+  if (nsibs[usc_fam$Sex[usc_fam$ID==ID]+1] > 0) {
+    nsibs[usc_fam$Sex[usc_fam$ID==ID]+1] = nsibs[usc_fam$Sex[usc_fam$ID==ID]+1]-1
   }
   
   # Return table of relative counts
@@ -153,11 +169,13 @@ run_models_5BC = function(fam_PP, fam_BM, database=BackCompatibleDatabase) {
   
   # Run PanelPRO-5BC
   probs_PP = extract_probs(PanelPRO::BRCAPRO5(fam_PP, database=database,
+                                              max.mut = 2,
                                               impute.missing.ages=FALSE,
                                               parallel=FALSE,
                                               allow.intervention=FALSE))
   # Run PanelPRO's brcapro
   probs_PP_brcapro = extract_probs(PanelPRO::BRCAPRO(fam_PP, database=database,
+                                                     max.mut = 2,
                                                      impute.missing.ages=FALSE,
                                                      parallel=FALSE, 
                                                      allow.intervention=FALSE))
@@ -182,6 +200,10 @@ run_models_5BC = function(fam_PP, fam_BM, database=BackCompatibleDatabase) {
                                    PP_brcapro=probs_PP_brcapro, 
                                    BM_brcapro=probs_BM_brcapro), 
                               function(x) x[match(names(probs_PP), names(x))]))
+  
+  # Rename genotypes
+  colnames(out) = PanelPRO:::formatGeneNames(colnames(out), 
+                                             format = "only_gene")
   return(out)
 }
 
@@ -192,11 +214,13 @@ run_models_5BC_rm = function(fam_PP, fam_BM_list, database=BackCompatibleDatabas
   
   # Run PanelPRO-5BC
   probs_PP = extract_probs(PanelPRO::BRCAPRO5(fam_PP, database=database,
+                                              max.mut = 2,
                                               impute.missing.ages=TRUE,
                                               parallel=FALSE,
                                               allow.intervention=TRUE))
   # Run PanelPRO's brcapro
   probs_PP_brcapro = extract_probs(PanelPRO::BRCAPRO(fam_PP, database=database,
+                                                     max.mut = 2,
                                                      impute.missing.ages=FALSE,
                                                      parallel=FALSE, 
                                                      allow.intervention=TRUE))
@@ -224,6 +248,10 @@ run_models_5BC_rm = function(fam_PP, fam_BM_list, database=BackCompatibleDatabas
                                    PP_brcapro=probs_PP_brcapro, 
                                    BM_brcapro=probs_BM_brcapro), 
                               function(x) x[match(names(probs_PP), names(x))]))
+  
+  # Rename genotypes
+  colnames(out) = PanelPRO:::formatGeneNames(colnames(out), 
+                                             format = "only_gene")
   return(out)
 }
 
@@ -235,29 +263,34 @@ run_models_7 = function(fam_PP, fam_BM, database=BackCompatibleDatabase) {
   
   # Run PanelPRO-7
   probs_PP = extract_probs(my_PanelPRO7(fam_PP, database=database,
+                                        max.mut = 2,
                                         impute.missing.ages=FALSE,
                                         parallel=FALSE,
                                         allow.intervention=FALSE))
   # Run PanelPRO's brcapro
   probs_PP_brcapro = extract_probs(PanelPRO::BRCAPRO(fam_PP, database=database,
+                                                     max.mut = 2,
                                                      impute.missing.ages=FALSE,
                                                      parallel=FALSE,
                                                      allow.intervention=FALSE))
   
   # Run PanelPRO's mmrpro
   probs_PP_mmrpro = extract_probs(PanelPRO::MMRPRO(fam_PP, database=database,
+                                                   max.mut = 2,
                                                    impute.missing.ages=FALSE,
                                                    parallel=FALSE,
                                                    allow.intervention=FALSE))
   
   # Run PanelPRO's pancpro
   probs_PP_pancpro = extract_probs(my_pancpro(fam_PP, database=database,
+                                              max.mut = 2,
                                               impute.missing.ages=FALSE, 
                                               parallel=FALSE,
                                               allow.intervention=FALSE))
   
   # Run PanelPRO's melapro
   probs_PP_melapro = extract_probs(my_melapro(fam_PP, database=database,
+                                              max.mut = 2,
                                               impute.missing.ages=FALSE, 
                                               parallel=FALSE,
                                               allow.intervention=FALSE))
@@ -284,8 +317,7 @@ run_models_7 = function(fam_PP, fam_BM, database=BackCompatibleDatabase) {
                                                    params=MMRparams(penetrance.net=penet.mmr.net.PP),
                                                    imputeAges=FALSE, 
                                                    imputeRelatives=FALSE)@posterior[1:2,1:2,1:2])[1:7]
-  names(probs_BM_mmrpro) = c("noncarrier", "MLH1", "MSH2", "MLH1.MSH2", 
-                             "MSH6", "MLH1.MSH6", "MSH2.MSH6")
+  names(probs_BM_mmrpro) = names(probs_PP_mmrpro)[c(1,2,3,5,4,6,7)]
   
   probs_PP_mmrpro[setdiff(names(probs_PP), names(probs_PP_mmrpro))] = NA
   probs_BM_mmrpro[setdiff(names(probs_PP), names(probs_BM_mmrpro))] = NA
@@ -324,6 +356,11 @@ run_models_7 = function(fam_PP, fam_BM, database=BackCompatibleDatabase) {
                                    BM_pancpro=probs_BM_pancpro, 
                                    BM_melapro=probs_BM_melapro), 
                               function(x) x[match(names(probs_PP), names(x))]))
+  
+  # Rename genotypes
+  colnames(out) = PanelPRO:::formatGeneNames(colnames(out), 
+                                             format = "only_gene")
+  
   return(out)
 }
 
@@ -334,23 +371,27 @@ run_models_11 = function(fam_PP, fam_BM, database=BackCompatibleDatabase) {
   
   # Run PanelPRO-11
   probs_PP = extract_probs(PanelPRO::PanelPRO11(fam_PP, database=database,
+                                                max.mut = 2,
                                                 impute.missing.ages=FALSE,
                                                 parallel=FALSE,
                                                 allow.intervention=FALSE))
   # Run PanelPRO's brcapro
   probs_PP_brcapro = extract_probs(PanelPRO::BRCAPRO(fam_PP, database=database,
+                                                     max.mut = 2,
                                                      impute.missing.ages=FALSE,
                                                      parallel=FALSE,
                                                      allow.intervention=FALSE))
   
   # Run PanelPRO's mmrpro
   probs_PP_mmrpro = extract_probs(PanelPRO::MMRPRO(fam_PP, database=database,
+                                                   max.mut = 2,
                                                    impute.missing.ages=FALSE,
                                                    parallel=FALSE,
                                                    allow.intervention=FALSE))
   
   # Run PanelPRO's melapro
   probs_PP_melapro = extract_probs(my_melapro(fam_PP, database=database,
+                                              max.mut = 2,
                                               impute.missing.ages=FALSE, 
                                               parallel=FALSE,
                                               allow.intervention=FALSE))
@@ -377,8 +418,7 @@ run_models_11 = function(fam_PP, fam_BM, database=BackCompatibleDatabase) {
                                                    params=MMRparams(penetrance.net=penet.mmr.net.PP),
                                                    imputeAges=FALSE, 
                                                    imputeRelatives=FALSE)@posterior[1:2,1:2,1:2])[1:7]
-  names(probs_BM_mmrpro) = c("noncarrier", "MLH1", "MSH2", "MLH1.MSH2", 
-                             "MSH6", "MLH1.MSH6", "MSH2.MSH6")
+  names(probs_BM_mmrpro) = names(probs_PP_mmrpro)[c(1,2,3,5,4,6,7)]
   
   probs_PP_mmrpro[setdiff(names(probs_PP), names(probs_PP_mmrpro))] = NA
   probs_BM_mmrpro[setdiff(names(probs_PP), names(probs_BM_mmrpro))] = NA
@@ -405,6 +445,11 @@ run_models_11 = function(fam_PP, fam_BM, database=BackCompatibleDatabase) {
                                    BM_mmrpro=probs_BM_mmrpro, 
                                    BM_melapro=probs_BM_melapro), 
                               function(x) x[match(names(probs_PP), names(x))]))
+  
+  # Rename genotypes
+  colnames(out) = PanelPRO:::formatGeneNames(colnames(out), 
+                                             format = "only_gene")
+  
   return(out)
 }
 
@@ -415,23 +460,27 @@ run_models_11_rm = function(fam_PP, fam_BM_list, database=BackCompatibleDatabase
   
   # Run PanelPRO-11
   probs_PP = extract_probs(PanelPRO::PanelPRO11(fam_PP, database=database,
+                                                max.mut = 2,
                                                 impute.missing.ages=TRUE,
                                                 parallel=FALSE,
                                                 allow.intervention=TRUE))
   # Run PanelPRO's brcapro
   probs_PP_brcapro = extract_probs(PanelPRO::BRCAPRO(fam_PP, database=database,
+                                                     max.mut = 2,
                                                      impute.missing.ages=FALSE,
                                                      parallel=FALSE, 
                                                      allow.intervention=TRUE))
   
   # Run PanelPRO's mmrpro
   probs_PP_mmrpro = extract_probs(PanelPRO::MMRPRO(fam_PP, database=database,
+                                                   max.mut = 2,
                                                    impute.missing.ages=FALSE,
                                                    parallel=FALSE,
                                                    allow.intervention=TRUE))
   
   # Run PanelPRO's melapro
   probs_PP_melapro = extract_probs(my_melapro(fam_PP, database=database,
+                                              max.mut = 2,
                                               impute.missing.ages=FALSE, 
                                               parallel=FALSE, 
                                               allow.intervention=TRUE))
@@ -464,8 +513,7 @@ run_models_11_rm = function(fam_PP, fam_BM_list, database=BackCompatibleDatabase
                                                    params=MMRparams(penetrance.net=penet.mmr.net.PP),
                                                    imputeAges=FALSE, 
                                                    imputeRelatives=FALSE)@posterior[1:2,1:2,1:2])[1:7]
-  names(probs_BM_mmrpro) = c("noncarrier", "MLH1", "MSH2", "MLH1.MSH2", 
-                             "MSH6", "MLH1.MSH6", "MSH2.MSH6")
+  names(probs_BM_mmrpro) = names(probs_PP_mmrpro)[c(1,2,3,5,4,6,7)]
   
   probs_PP_mmrpro[setdiff(names(probs_PP), names(probs_PP_mmrpro))] = NA
   probs_BM_mmrpro[setdiff(names(probs_PP), names(probs_BM_mmrpro))] = NA
@@ -494,5 +542,10 @@ run_models_11_rm = function(fam_PP, fam_BM_list, database=BackCompatibleDatabase
                                    BM_mmrpro=probs_BM_mmrpro, 
                                    BM_melapro=probs_BM_melapro), 
                               function(x) x[match(names(probs_PP), names(x))]))
+  
+  # Rename genotypes
+  colnames(out) = PanelPRO:::formatGeneNames(colnames(out), 
+                                             format = "only_gene")
+  
   return(out)
 }

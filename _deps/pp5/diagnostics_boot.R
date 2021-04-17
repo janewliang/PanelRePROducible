@@ -38,7 +38,7 @@ diagnostics_boot = lapply(1:R, function(i){
                                 noncarrier_idx, return_carriers=FALSE), 
     BRCA2 = get_all_diagnostics("BRCA2", "brcapro", boot_mut_df, boot_prob_df, 
                                 noncarrier_idx, return_carriers=FALSE), 
-    brcapro_genes = get_all_diagnostics(c("BRCA1", "BRCA2"), "brcapro", 
+    BRCAPRO_genes = get_all_diagnostics(c("BRCA1", "BRCA2"), "brcapro", 
                                         boot_mut_df, boot_prob_df, 
                                         noncarrier_idx, return_carriers=FALSE), 
     CHEK2 = get_all_diagnostics("CHEK2", NULL, boot_mut_df, boot_prob_df, 
