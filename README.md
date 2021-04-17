@@ -15,7 +15,7 @@ Additional details can be found in the sub-directory README files.
 
 ### Shared Code Dependencies
 - `_deps/`: Functions for running PanelPRO models and obtaining diagnostic metrics. They are called as dependencies to run the simulation studies and data application. 
-- `simulate_families`: Functions for simulating detailed pedigrees, including family history of cancer, genotypes, and tumor marker testing results. 
+- `simulate_families/`: Functions for simulating detailed pedigrees, including family history of cancer, genotypes, and tumor marker testing results. 
 
 ### Simulation Studies
 - `sim/`: Code to run simulation studies where the simulated families have family structures sampled from the HCP cohort. 
