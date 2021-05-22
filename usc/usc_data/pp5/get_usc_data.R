@@ -92,11 +92,6 @@ mod_cancers = c("Breast", "breast",
                 "Ovary", "ovarian")
 usc_df$OtherCancers = !(usc$Cancer.History.Table.Cancer.Diagnosis %in% 
                           mod_cancers)
-for (i in 1:9){
-  usc_df$OtherCancers = usc_df$OtherCancers & 
-    !(usc[,paste0("Cancer.History.Table.Cancer.Diagnosis_", i)] %in% 
-        mod_cancers)
-}
 
 
 # BayesMendel without modifiers
