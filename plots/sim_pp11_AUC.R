@@ -18,7 +18,7 @@ setwd(cur_dir)
 ## Cancers and genes to use
 # Short cancer names (including CBC)
 cancers = c("BRA", "BC", "COL", "ENDO", "GAS", "KID", 
-            "MELA", "OC", "PANC", "PROS", "SMA", "CBC")
+            "MELA", "OC", "PANC", "PROS", "SI", "CBC")
 # Look up long cancer names (don't include CBC)
 cancers_long = PanelPRO:::CANCER_NAME_MAP$long[sapply(cancers[-length(cancers)], function(x){
   which(x==PanelPRO:::CANCER_NAME_MAP$short)

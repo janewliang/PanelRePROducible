@@ -44,10 +44,12 @@ get_all_diagnostics = function(gene, BM_model,
   # Case 1: any gene
   if (length(gene)==1 && gene=="Any") {
     # Carriers of any mutation
-    mutation_status = ifelse(rowSums(mut_df)==0, 0, 1)
+    mutation_status = ifelse(rowSums(mut_df, na.rm = TRUE)==0, 0, 1)
     
     # Diagnostics with PanelPRO carrier probability of any mutation
-    carrier_PP = colSums(prob_df["PanelPRO",-1,]) 
+    carrier_PP = colSums(prob_df["PanelPRO",-1,], na.rm = TRUE) 
+    carrier_PP = carrier_PP / 
+      (carrier_PP + prob_df["PanelPRO",1,])
     
     # Case 2: any BayesMendel gene
   } else if (length(gene)==1 && gene=="Any_BM") {
@@ -62,14 +64,14 @@ get_all_diagnostics = function(gene, BM_model,
     }
     
     # Carriers of any gene in the vector
-    mutation_status = ifelse(rowSums(mut_df[,gene])==0, 0, 1)
+    mutation_status = ifelse(rowSums(mut_df[,gene], na.rm = TRUE)==0, 0, 1)
     
     # All genes and gene combinations
     all_genes = unique(sapply(gene, grep, colnames(prob_df)))
     
     # Diagnostics with PanelPRO carrier probability of 
     # any gene in the vector
-    carrier_PP = colSums(prob_df["PanelPRO",all_genes,])
+    carrier_PP = colSums(prob_df["PanelPRO",all_genes,], na.rm = TRUE)
     carrier_PP = carrier_PP / 
       (carrier_PP + prob_df["PanelPRO",1,])
     
@@ -104,14 +106,14 @@ get_all_diagnostics = function(gene, BM_model,
     # Case 4: pass in a vector of genes
   } else if (length(gene)>1) {
     # Carriers of any gene in the vector
-    mutation_status = ifelse(rowSums(mut_df[,gene])==0, 0, 1)
+    mutation_status = ifelse(rowSums(mut_df[,gene], na.rm = TRUE)==0, 0, 1)
     
     # All genes and gene combinations
-    all_genes = unique(sapply(gene, grep, colnames(prob_df)))
+    all_genes = unique(as.numeric(sapply(gene, grep, colnames(prob_df))))
     
     # Diagnostics with PanelPRO carrier probability of 
     # any gene in the vector
-    carrier_PP = colSums(prob_df["PanelPRO",all_genes,])
+    carrier_PP = colSums(prob_df["PanelPRO",all_genes,], na.rm = TRUE)
     carrier_PP = carrier_PP / 
       (carrier_PP + prob_df["PanelPRO",1,])
     

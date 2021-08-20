@@ -5,7 +5,7 @@
 #SBATCH -e results/cluster/diagnostics__%A_%a.err #Standard error
 #SBATCH -p serial_requeue #Partition
 #SBATCH -t 1440         #Runtime in minutes
-#SBATCH --mem-per-cpu=50000 #Memory request
+#SBATCH --mem-per-cpu=100000 #Memory request
 #SBATCH -n 1 #Number of cores
 #SBATCH -N 1 #All cores on one machine
 #SBATCH --mail-type=END # Email

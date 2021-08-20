@@ -53,46 +53,16 @@ fam_output = lapply(1:nsim, function(i){
   
   
   # Simulate family
-  fam = sim.runSimFam(nSibsPatern, nSibsMatern, nSibs, nGrandchild, 
+  fam_PP = sim.runSimFam(nSibsPatern, nSibsMatern, nSibs, nGrandchild, 
                       BackCompatibleDatabase, genes, cancers, 
                       includeGeno=TRUE, includeBiomarkers=TRUE)
-  
-  # PanelPRO family
-  fam_PP = fam
-  # Remove mutations
-  fam_PP[,genes] = NULL
-  
-  # BayesMendel family
-  fam_BM = fam2BayesMendelFam(fam)
-  # brcapro tumor marker testing
-  brca.marker.testing = fam[c("ER", "CK14", "CK5.6", "PR", "HER2")]
-  # Set 0 to 2 (negative test)
-  brca.marker.testing[brca.marker.testing==0] = 2
-  # Set NA to 0 (not tested)
-  brca.marker.testing[is.na(brca.marker.testing)] = 0
-  if (all(rowSums(brca.marker.testing)==0)) {
-    brca.marker.testing = NULL
-  }
-  # mmrpro tumor marker testing
-  mmr.marker.testing = data.frame(MSI=fam$MSI, location=0)
-  # Set 0 to 2 (negative test)
-  mmr.marker.testing[mmr.marker.testing==0] = 2
-  # Set NA to 0 (not tested)
-  mmr.marker.testing[is.na(mmr.marker.testing)] = 0
-  if (all(rowSums(mmr.marker.testing)==0)) {
-    mmr.marker.testing = NULL
-  }
-  # Put together list with modifiers
-  fam_BM_list = list(fam = fam_BM,
-                     brcapro=list(germline.testing=NULL, 
-                                  marker.testing=brca.marker.testing), 
-                     mmrpro=list(germline.testing=NULL, 
-                                 marker.testing=mmr.marker.testing), 
-                     melapro=list(germline.testing=NULL))
+  # Drop genotype columns for model run
+  fam_temp = fam_PP
+  fam_temp[,genes] = NULL
   
   # Run models
-  out = run_models_11_rm(fam_PP, fam_BM_list)
-  return(list(fam = fam, probs = out))
+  out = run_models_11_rm(fam_temp)
+  return(list(fam = fam_PP, probs = out))
 })
 
 

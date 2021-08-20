@@ -50,33 +50,16 @@ fam_output = lapply(1:nsim, function(i){
   
   
   # Simulate family
-  fam = sim.runSimFam(nSibsPatern, nSibsMatern, nSibs, nGrandchild, 
-                      BackCompatibleDatabase, genes, cancers, 
-                      includeGeno=TRUE, includeBiomarkers=TRUE)
-  # PanelPRO family
-  fam_PP = fam
-  # Remove mutations
-  fam_PP[,genes] = NULL
-  
-  # BayesMendel family
-  fam_BM = fam2BayesMendelFam(fam)
-  # brcapro tumor marker testing
-  brca.marker.testing = fam[c("ER", "CK14", "CK5.6", "PR", "HER2")]
-  # Set 0 to 2 (negative test)
-  brca.marker.testing[brca.marker.testing==0] = 2
-  # Set NA to 0 (not tested)
-  brca.marker.testing[is.na(brca.marker.testing)] = 0
-  if (all(rowSums(brca.marker.testing)==0)) {
-    brca.marker.testing = NULL
-  }
-  # Put together list with modifiers
-  fam_BM_list = list(fam = fam_BM,
-                     brcapro = list(germline.testing = NULL,
-                                    marker.testing = brca.marker.testing))
+  fam_PP = sim.runSimFam(nSibsPatern, nSibsMatern, nSibs, nGrandchild, 
+                         BackCompatibleDatabase, genes, cancers, 
+                         includeGeno=TRUE, includeBiomarkers=TRUE)
+  # Drop genotype columns for model run
+  fam_temp = fam_PP
+  fam_temp[,genes] = NULL
   
   # Run models
-  out = run_models_5BC_rm(fam_PP, fam_BM_list)
-  return(list(fam = fam, probs = out))
+  out = run_models_5BC_rm(fam_temp)
+  return(list(fam = fam_PP, probs = out))
 })
 
 

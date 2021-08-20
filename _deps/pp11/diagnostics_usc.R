@@ -8,8 +8,8 @@ load("../usc_data/pp11/usc_families.rData")
 
 ###############################################################################
 
-# 20 sets of family results
-S = 20
+# 251 sets of family results
+S = 251
 
 # Putting all of the family simulation results together
 all_probs = NULL
@@ -17,17 +17,14 @@ for (s in 1:S){
   load(paste0("results/output/fam", s, ".rData"))
   all_probs = c(all_probs, fam_output)
 }
-# 3 failed families out of 1498 (3 loops)
+# 38 failed families out of 1506
 failed_families = sapply(all_probs, function(x){length(x)==0 || class(x)=="try-error"})
+failed_errs = all_probs[failed_families]
+names(failed_errs) = which(failed_families)
 all_probs[failed_families] = NULL
 
 # Pull out the proband mutation information from each family
-mutations = c("ATM", "BRCA1", "BRCA2", "CDKN2A", "CHEK2", "EPCAM",
-              "MLH1", "MSH2", "MSH6", "PALB2", "PMS2")
-mut_df = data.frame(t(sapply(usc_families_PP, function(fam){
-  unlist(fam[fam$isProband==1,mutations])
-})))
-mut_df = mut_df[!failed_families,]
+mut_df = proband_muts[!failed_families,]
 
 # Pull out the probabilities for each model and save as a 3D array
 prob_df = abind(all_probs, along=3)
@@ -68,5 +65,6 @@ diagnostics = lapply(all_out, function(x){x[[1]]})
 carrier_probs = lapply(all_out, function(x){x[2:length(x)]})
 
 # Save output
-save(diagnostics, file="results/diagnostics/diagnostics.rData")
+save(diagnostics, failed_errs, failed_families, 
+     file="results/diagnostics/diagnostics.rData")
 save(carrier_probs, file="results/diagnostics/carrier_probs.rData")

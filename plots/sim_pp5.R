@@ -217,7 +217,7 @@ invisible(sapply(names(metrics), function(x) {
   # x-axis labels for gene names
   if (x == "MSE") {
     axis(1, at = 1:length(BM_genes), labels = FALSE)
-    text(x=1:length(BM_genes), y = -1.9e-4, 
+    text(x=1:length(BM_genes), y = -3.6e-4, 
          srt=30, adj=1, xpd = TRUE, 
          labels=names(BM_genes))
   } 

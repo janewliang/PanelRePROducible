@@ -56,10 +56,9 @@ fam_output = lapply(1:nsim, function(i){
   fam_PP = sim.runSimFam(nSibsPatern, nSibsMatern, nSibs, nGrandchild, 
                          BackCompatibleDatabase, genes, cancers, 
                          includeGeno=TRUE)
-  fam_BM = fam2BayesMendelFam(fam_PP)
   
   # Run models
-  out = run_models_11(fam_PP, fam_BM)
+  out = run_models_11(fam_PP)
   return(list(fam = fam_PP, probs = out))
 })
 
