@@ -1,7 +1,7 @@
 Code to validate PanelPRO models on data from the USC-Stanford Hereditary Cancer Panel (HCP) Testing Study<sup>[1](#myfootnote1)</sup>. 
 
 ### Data processing
-- `usc_data/`: Process the HCP data by dropping families where the counselee is a carrier of one or more variants, but not of variants for any of the genes in the model; where the counselee has a variant of uncertain significance (VUS), but not a pathogenic variant for any of the genes in the model; or where the counselee contains missing information. Format the data so that it is ready to be passed into the models. 
+- `usc_data/`: Process the HCP data by dropping families where the counselee is a carrier of one or more variants, but not of variants for any of the genes in the model; or where the counselee has a variant of uncertain significance (VUS), but not a pathogenic variant for any of the genes in the model. Format the data so that it is ready to be passed into the models. 
   - `pp5/`: Contains the file `get_usc_data.R`, which is used to process the HCP data for validation with PanelPRO-5BC. 
   - `pp7/`: Contains the file `get_usc_data.R`, which is used to process the HCP data for validation with PanelPRO-7. 
   - `pp11/`: Contains the file `get_usc_data.R`, which is used to process the HCP data for validation with PanelPRO-11. 

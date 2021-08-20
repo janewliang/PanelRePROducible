@@ -149,30 +149,3 @@ pp24_tables = get_table1(usc_families_PP,
                                      "PANC", "PROS", "SI"), 
                          markers = c("ER", "CK14", "CK5.6", 
                                      "PR", "HER2", "MSI"))
-
-
-# Counts of people with multiple cancers
-load("pp11/usc_families.rData")
-cancers = c("BRA", "BC", "COL", "ENDO", 
-            "GAS", "KID", "MELA", "OC", 
-            "PANC", "PROS", "SI")
-cancer_counts = sapply(usc_families_PP, function(fam) {
-  c(nrow(fam), 
-    sum(rowSums(fam[,c(paste0("isAff", cancers), "OtherCancerCount")]) == 1), 
-    sum(rowSums(fam[,c(paste0("isAff", cancers), "OtherCancerCount")]) == 2), 
-    sum(rowSums(fam[,c(paste0("isAff", cancers), "OtherCancerCount")]) > 2))
-})
-rowSums(cancer_counts)
-# 31787 31406   355    26
-(31406 + 355 + 26) / 31787
-# 1 # Everybody has at least 1 cancer
-(355 + 26) / (31406 + 355 + 26)
-# 0.01198603 # People with a cancer who develop additional cancer
-
-# NEW
-rowSums(cancer_counts)
-# 50902  6083   454    53
-(6083 + 454 + 53) / 50902
-# 0.1294645 # 0.1294645 have at least 1 cancer
-(454 + 53) / (6083 + 454 + 53)
-# 0.07693475 # People with a cancer who develop additional cancer
