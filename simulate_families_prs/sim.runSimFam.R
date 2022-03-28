@@ -84,7 +84,8 @@ sim.runSimFam = function(nSibsPatern, nSibsMatern, nSibs, nGrandchild,
                          includeGeno = FALSE, includeGrandparents = TRUE, 
                          censoring = TRUE, genderPro = NULL, 
                          genoMat = NULL, CurAge = NULL, affTime = FALSE, 
-                         includeBiomarkers = FALSE, maxTries = 5) {
+                         includeBiomarkers = FALSE, maxTries = 5, 
+                         latent = NULL) {
   
   # Look up short cancer names and include CBC
   cancers_short = c(
@@ -166,5 +167,5 @@ sim.runSimFam = function(nSibsPatern, nSibsMatern, nSibs, nGrandchild,
                       genoMat = genoMat, CurAge = CurAge, affTime = affTime, 
                       BiomarkerTesting = database$BiomarkerTesting, 
                       includeBiomarkers = includeBiomarkers, 
-                      maxTries = maxTries)
+                      maxTries = maxTries, latent = latent)
 }

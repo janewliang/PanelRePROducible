@@ -281,3 +281,71 @@ dev.off()
 # Frequency table
 table("Any MMRpro" = carrier_df$MMRpro_any[carrier_df$Any==1] > 0.025, 
       "Any PanelPRO-11" = carrier_df$PanelPRO_any[carrier_df$Any==1] > 0.025)
+
+
+
+# Load families and drop the ones that resulted in model errors
+load("../usc/usc_data/pp11/usc_families.rData")
+usc_families_PP = usc_families_PP[!failed_families]
+
+# Cancers
+cancers = c("BRA", "BC", "COL", "ENDO", 
+            "GAS", "KID", "MELA", "OC", 
+            "PANC", "PROS", "SI")
+# Number of each cancer type
+cancer_df = data.frame(
+  t(sapply(usc_families_PP, function(fam) {
+    colSums(fam[,paste0("isAff", cancers)], na.rm = TRUE)
+  }))
+)
+names(cancer_df) = cancers
+# Number of any cancer
+cancer_df$AnyCancer = rowSums(cancer_df[,cancers])
+
+# Colors for plotting carrier probabilities colored by cancer type (brcapro)
+carrier_df$bc_group = rgb(0,0,0,0)
+carrier_df$bc_group[cancer_df$AnyCancer >= 1] = "black"
+carrier_df$bc_group[(cancer_df$BC >= 1 | cancer_df$OC >= 1)] = "#0072B2"
+carrier_df$bc_group[(cancer_df$PANC >= 1 | cancer_df$PROS >= 1)] = "#E69F00"
+carrier_df$bc_group[(cancer_df$BC >= 1 | cancer_df$OC >= 1) & (cancer_df$PANC >= 1 | cancer_df$PROS >= 1)] = "#CC79A7"
+
+# Plot carrier probabilities for brcapro and PanelPRO-11
+png(paste0(img_dir, "thresh_any_brcapro_cancer_type.png"), 
+    width = 350, height = 350)
+par(mar = c(4, 4, 1, 1), bg=NA)
+plot(carrier_df$brcapro_any[carrier_df$Any==1], 
+     carrier_df$PanelPRO_any[carrier_df$Any==1], 
+     pch = 16, 
+     col = carrier_df$bc_group[carrier_df$Any==1], 
+     xlab = "Any BRCAPRO", ylab = "Any PanelPRO-11")
+abline(h=0.025)
+abline(v=0.025)
+legend("top", legend = c("BC or OC", "PANC or PROS", 
+                         "(BC or OC) and (PANC or PROS)", 
+                         "Other Cancers"), 
+       pch = 16, col = c("#0072B2", "#E69F00", "#CC79A7", "black"), bty = "n")
+dev.off()
+
+# Colors for plotting carrier probabilities colored by cancer type (MMRpro)
+carrier_df$cc_group = rgb(0,0,0,0)
+carrier_df$cc_group[cancer_df$AnyCancer >= 1] = "black"
+carrier_df$cc_group[(cancer_df$COL >= 1 | cancer_df$ENDO >= 1)] = "#0072B2"
+carrier_df$cc_group[(cancer_df$BRA >= 1 | cancer_df$GAS >= 1 | cancer_df$OC >= 1 | cancer_df$PANC >= 1 | cancer_df$SI >= 1)] = "#E69F00"
+carrier_df$cc_group[(cancer_df$COL >= 1 | cancer_df$ENDO >= 1) & (cancer_df$BRA >= 1 | cancer_df$GAS >= 1 | cancer_df$OC >= 1 | cancer_df$PANC >= 1 | cancer_df$SI >= 1)] = "#CC79A7"
+
+# Plot carrier probabilities for MMRpro and PanelPRO-11
+png(paste0(img_dir, "thresh_any_mmrpro_cancer_type.png"), 
+    width = 350, height = 350)
+par(mar = c(4, 4, 1, 1), bg=NA)
+plot(carrier_df$MMRpro_any[carrier_df$Any==1], 
+     carrier_df$PanelPRO_any[carrier_df$Any==1], 
+     pch = 16, 
+     col = carrier_df$cc_group[carrier_df$Any==1], 
+     xlab = "Any MMRpro", ylab = "Any PanelPRO-11")
+abline(h=0.025)
+abline(v=0.025)
+legend("top", legend = c("COL or ENDO", "BRA, GAS, OC, PANC, or SI", 
+                         "(COL or ENDO) and \n(BRA, GAS, OC, PANC, or SI)", 
+                         "Other Cancers"), 
+       pch = 16, col = c("#0072B2", "#E69F00", "#CC79A7", "black"), bty = "n")
+dev.off()

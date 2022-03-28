@@ -151,3 +151,45 @@ sim.buildGenoMat = function(alleleFreq, nChildPatern, nChildMatern,
   
   return(genoMat)
 }
+
+
+sim.buildLatentMat = function(alleleFreq, nChildPatern, nChildMatern, 
+                            nChild, nGrandchildInBranches){ 
+  if (length(nChildPatern) != 2) {
+    stop("nChildPatern needs to be a numeric vector of length 2")
+  }
+  if (length(nChildMatern) != 2) {
+    stop("nChildMatern needs to be a numeric vector of length 2")
+  }
+  if (length(nChild) != 2) {
+    stop("nChild needs to be a numeric vector of length 2")
+  }
+  if (ncol(nGrandchildInBranches) != 2) {
+    stop("nGrandchildInBranches needs to have 2 columns")
+  }
+  if (nrow(nGrandchildInBranches) != sum(nChild)) {
+    stop("Number of rows in nGrandchildInBranches does not equal number of children in nChild")
+  }
+  
+  # Simulate 3D array of alleles
+  alleleArray = sim.buildAlleleArray(alleleFreq, nChildPatern, 
+                                     nChildMatern, nChild, 
+                                     nGrandchildInBranches)
+  
+  # Sum array of alleles across the alleles
+  alleleSumMat = matrix(
+    apply(alleleArray, 1, function(x) {
+      colSums(x)
+    }), ncol = nrow(alleleArray)
+  )
+  
+  # Return named matrix of genotypes 
+  latentMat = matrix(t(alleleSumMat != 0)*1, ncol=length(alleleFreq))
+  if (is.null(names(alleleFreq))) {
+    colnames(latentMat) = letters[1:ncol(latentMat)]
+  } else {
+    colnames(latentMat) = names(alleleFreq)
+  }
+  
+  return(latentMat)
+}

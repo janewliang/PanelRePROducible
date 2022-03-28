@@ -29,7 +29,8 @@
 #' @family simulations
 sim.simCancerVars = function(genoMat, Gender, CurAge, CP, PG, cancers, 
                              ageMax = 94, ageMin = 2, 
-                             censoring = TRUE, affTime = FALSE) {
+                             censoring = TRUE, affTime = FALSE,
+                             latent = NULL, latentScore = NULL) {
   # Short cancer names
   cancers_short = PanelPRO:::CANCER_NAME_MAP$short[match(cancers, PanelPRO:::CANCER_NAME_MAP$long)]
   
@@ -90,8 +91,10 @@ sim.simCancerVars = function(genoMat, Gender, CurAge, CP, PG, cancers,
     
     for(i in 1:N){ # Iterate over each person
       # Simulate time person was affected by cancer
-      affectedTime[i] = max(which(rmultinom(1, 1, prob=cancerDens[[Gender[i]+1]][,j,genoCombsIdx[i],,drop=FALSE])[,1]==1), 
-                            ageMin)
+      pen = cancerDens[[Gender[i]+1]][,j,genoCombsIdx[i],,drop=FALSE] 
+      pen[1:(length(pen)-1)] = pen[1:(length(pen)-1)] * latent$fact[latentScore[i]+1]
+      pen[length(pen)] = max(1 - sum(pen[1:(length(pen)-1)]), 0)
+      affectedTime[i] = max(which(rmultinom(1, 1, prob = pen)[,1] == 1), ageMin)
     }
     
     # If the person was affected at or before current age, the person is considered 

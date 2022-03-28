@@ -6,6 +6,8 @@ Code to run simulation studies where the simulated families have family structur
 - `pp11/`: Simulate families and evaluate them using PanelPRO-11, without incorporating risk modifiers. 
 - `pp11_extra/`: Simulate an additional 1 million families and evaluate them using PanelPRO-11, without incorporating risk modifiers. 
 - `pp11_riskmod/`: Simulate families and evaluate them using PanelPRO-11, while incorporating tumor marker testing as an additional risk modifier. 
+- `pp11_prs_snp20/`: Simulate families and evaluate them using PanelPRO-11, without incorporating risk modifiers but with an additional PRS calculated for each individual based on an 20 independent SNPs. 
+- `pp11_prs_snp40/`: Simulate families and evaluate them using PanelPRO-11, without incorporating risk modifiers but with an additional PRS calculated for each individual based on an 40 independent SNPs.  
 
 Each sub-directory contains the following files: 
 - `fam.R`: Code to simulate 1000 families at a time and run the PanelPRO models. 

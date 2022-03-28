@@ -84,7 +84,7 @@ sim.simFam = function(nSibsPatern, nSibsMatern, nSibs, nGrandchild,
                       genoMat = NULL, CurAge = NULL, affTime = FALSE, 
                       BiomarkerTesting = NULL, 
                       includeBiomarkers = FALSE, 
-                      maxTries = 5) {
+                      maxTries = 5, latent = NULL) {
   # Check that specified cancers are in the CP object
   if (any(!(cancers %in% dimnames(CP$Dens)$cancers))) {
     stop("Cancers that are not in the CP object have been specified.")
@@ -193,6 +193,15 @@ sim.simFam = function(nSibsPatern, nSibsMatern, nSibs, nGrandchild,
                      maxTries, "attempts.")))
   } 
   
+  
+  # Generate genotype matrix for latent risk factor
+  latentAlleleFreq = latent$af[-1]
+  names(latentAlleleFreq) = 1:(nrow(latent)-1)
+  latentMat = sim.buildLatentMat(latentAlleleFreq, nChildPatern, nChildMatern, 
+                                 nChild, nGrandchildInBranches)
+  # Generate latent risk factor score
+  latentScore = rowSums(latentMat)
+  
   # Total number of people in family
   N = nrow(genoMat)
   
@@ -285,7 +294,8 @@ sim.simFam = function(nSibsPatern, nSibsMatern, nSibs, nGrandchild,
   Cancers = sim.simCancerVars(genoMat, SexParentIDs$Sex, CurAge, 
                               CP, PG, cancers, 
                               ageMax = ageMax, censoring = censoring,
-                              affTime = affTime)
+                              affTime = affTime, latent = latent, 
+                              latentScore = latentScore)
   
   
   
@@ -365,11 +375,11 @@ sim.simFam = function(nSibsPatern, nSibsMatern, nSibs, nGrandchild,
   } 
   
   
-  # Include the genotype matrix for all members, if necessary
+  # Include the genotype matrix and latent score for all members, if necessary
   if (includeGeno==TRUE) {
     colnames(genoMat) = PanelPRO:::formatGeneNames(colnames(genoMat), 
                                                    format = "only_gene")
-    fam = data.frame(fam, genoMat)
+    fam = data.frame(fam, genoMat, latentScore = latentScore)
   } 
   
   return(fam)

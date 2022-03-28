@@ -2,7 +2,7 @@
 
 This repository contains code to reproduce the results presented in the paper 
 
-> **Liang, J. W., Idos, G. E., Hong, C., Gruber, S. B., Parmigiani, G., & Braun, D. (2021). PanelPRO: a general framework for multi-gene, multi-cancer Mendelian risk prediction models.**
+> **Liang, J. W., Idos, G. E., Hong, C., Gruber, S. B., Parmigiani, G., & Braun, D. (2022). PanelPRO: a general framework for multi-gene, multi-cancer Mendelian risk prediction models.**
 
 ## Dependencies
 - `PanelPRO` R package, Lee, G., et al. (2021)<sup>[1](#myfootnote1)</sup>. Download for non-clinical research purposes [here](https://projects.iq.harvard.edu/bayesmendel/panelpro).
@@ -16,6 +16,7 @@ Additional details can be found in the sub-directory README files.
 ### Shared Code Dependencies
 - `_deps/`: Functions for running PanelPRO models and obtaining diagnostic metrics. They are called as dependencies to run the simulation studies and data application. 
 - `simulate_families/`: Functions for simulating detailed pedigrees, including family history of cancer, genotypes, and tumor marker testing results. 
+- `simulate_families_prs/`: Functions for simulating detailed pedigrees, including family history of cancer, genotypes, and tumor marker testing results, with an additional PRS calculated for each individual based on an arbitrary number of independent SNPs. 
 
 ### Simulation Studies
 - `sim/`: Code to run simulation studies where the simulated families have family structures sampled from the HCP cohort. 

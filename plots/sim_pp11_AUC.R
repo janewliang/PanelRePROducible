@@ -1,5 +1,6 @@
 library(abind)
 library(knitr)
+library(RColorBrewer)
 
 cur_dir = getwd()
 res_dir = "../sim/pp11/"
@@ -111,9 +112,7 @@ AUCs = sapply(genes, function(x){
 ###############################################################################
 
 # Colors for plotting
-my_cols = c("#E69F00", "#009E73", "#882255", "#888888", 
-            "#CC6677", "#56B4E9", "#F0E442", "#D55E00", 
-            "#332288", "#0072B2", "#000000")
+my_cols = brewer.pal(12, "Paired")[c(seq(1,9,by=2), seq(2,12,by=2))]
 my_pch = c(0:6, 15:18)
 
 
@@ -136,17 +135,21 @@ dev.off()
 # AUC vs RR for all cancers and sexes
 png(paste0(img_dir, "AUC_RR.png"), width=800, height=500)
 par(mar=c(5.3, 5.3, 1, 8.3), bg=NA)
-plot(1, type="n", 
-     xlim=c(0, max(RR_female, RR_male, na.rm=TRUE)), 
+plot(1, type="n", xaxt = "n", 
+     xlim=c(log10(min(RR_female, RR_male, na.rm=TRUE)), 
+            log10(max(RR_female, RR_male, na.rm=TRUE))), 
      ylim=c(min(AUCs), 1), 
      xlab="Carrier/Noncarrier Risk of Cancer", ylab="AUC", 
      cex=1.8, cex.lab=1.6, cex.axis=1.6, cex.main=1.8)
 invisible(lapply(1:length(cancers_long), function(i){
-  points(RR_female[genes,cancers_long[i]], AUCs, 
+  points(log10(RR_female[genes,cancers_long[i]]), AUCs, 
          col=my_cols, pch=my_pch[i], cex=1.8)
-  points(RR_male[genes,cancers_long[i]], AUCs, 
+  points(log10(RR_male[genes,cancers_long[i]]), AUCs, 
          col=my_cols, pch=my_pch[i], cex=1.8)
 }))
+axis(1, at = log10(c(1, 2, 4, 10, 20, 50, 100)), 
+     labels = c(1, 2, 4, 10, 20, 50, 100), 
+     cex=1.8, cex.lab=1.6, cex.axis=1.6)
 legend("topright", legend=genes, 
        fill=my_cols, title="Gene", bty="n", cex=1, 
        xpd=TRUE, inset=c(-0.17,0))
@@ -159,15 +162,19 @@ dev.off()
 # AUC vs RR for all cancers, female only
 png(paste0(img_dir, "AUC_RR_female.png"), width=800, height=500)
 par(mar=c(5.3, 5.3, 1, 8.3), bg=NA)
-plot(1, type="n", 
-     xlim=c(0, max(RR_female, RR_male, na.rm=TRUE)), 
+plot(1, type="n", xaxt = "n", 
+     xlim=c(log10(min(RR_female, RR_male, na.rm=TRUE)), 
+            log10(max(RR_female, RR_male, na.rm=TRUE))), 
      ylim=c(min(AUCs), 1), 
      xlab="Carrier/Noncarrier Risk of Cancer", ylab="AUC", 
      cex=1.8, cex.lab=1.6, cex.axis=1.6, cex.main=1.8)
 invisible(lapply(1:length(cancers_long), function(i){
-  points(RR_female[genes,cancers_long[i]], AUCs, 
+  points(log10(RR_female[genes,cancers_long[i]]), AUCs, 
          col=my_cols, pch=my_pch[i], cex=1.8)
 }))
+axis(1, at = log10(c(1, 2, 4, 10, 20, 50, 100)), 
+     labels = c(1, 2, 4, 10, 20, 50, 100), 
+     cex=1.8, cex.lab=1.6, cex.axis=1.6)
 legend("topright", legend=genes, 
        fill=my_cols, title="Gene", bty="n", cex=1, 
        xpd=TRUE, inset=c(-0.17,0))
@@ -180,15 +187,19 @@ dev.off()
 # AUC vs RR for all cancers, male only
 png(paste0(img_dir, "AUC_RR_male.png"), width=800, height=500)
 par(mar=c(5.3, 5.3, 1, 8.3), bg=NA)
-plot(1, type="n", 
-     xlim=c(0, max(RR_female, RR_male, na.rm=TRUE)), 
+plot(1, type="n", xaxt = "n", 
+     xlim=c(log10(min(RR_female, RR_male, na.rm=TRUE)), 
+            log10(max(RR_female, RR_male, na.rm=TRUE))), 
      ylim=c(min(AUCs), 1), 
      xlab="Carrier/Noncarrier Risk of Cancer", ylab="AUC", 
      cex=1.8, cex.lab=1.6, cex.axis=1.6, cex.main=1.8)
 invisible(lapply(1:length(cancers_long), function(i){
-  points(RR_male[genes,cancers_long[i]], AUCs, 
+  points(log10(RR_male[genes,cancers_long[i]]), AUCs, 
          col=my_cols, pch=my_pch[i], cex=1.8)
 }))
+axis(1, at = log10(c(1, 2, 4, 10, 20, 50, 100)), 
+     labels = c(1, 2, 4, 10, 20, 50, 100), 
+     cex=1.8, cex.lab=1.6, cex.axis=1.6)
 legend("topright", legend=genes, 
        fill=my_cols, title="Gene", bty="n", cex=1, 
        xpd=TRUE, inset=c(-0.17,0))
